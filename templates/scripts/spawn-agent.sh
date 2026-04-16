@@ -110,55 +110,63 @@ AGENT_PROMPT="$(echo "${MATCHED_ENTRY#*|}" | sed 's/^[[:space:]]*//')"
 
 echo "Spawning [${AGENT_LABEL}] in session '${SESSION}'..."
 
-# ── Open new pane on the right, stack vertically ──────────────────────────────
+# ── Resolve active window and first pane (by unique pane ID, not positional index) ───
 
-# Count existing panes to determine where to split
-PANE_COUNT="$(tmux list-panes -t "${SESSION}:0" | wc -l | tr -d ' ')"
+WIN="$(tmux display-message -t "${SESSION}" -p '#I')"
+# Get unique pane IDs (%N) for this window — order = creation order
+PANE_IDS=( $(tmux list-panes -t "${SESSION}:${WIN}" -F '#{pane_id}') )
+PANE_COUNT="${#PANE_IDS[@]}"
+FIRST_PANE_ID="${PANE_IDS[1]}"   # zsh arrays are 1-based
+LAST_PANE_ID="${PANE_IDS[$PANE_COUNT]}"
+
+# ── Open new pane on the right, stack vertically ──────────────────────────────
 
 if [[ "$PANE_COUNT" -eq 1 ]]; then
   # Only Team Lead exists — split horizontally to create the right column
-  tmux split-window -t "${SESSION}:0.0" -h -c "$PROJ"
-  NEW_PANE=1
+  NEW_PANE_ID="$(tmux split-window -t "${FIRST_PANE_ID}" -h -c "$PROJ" -P -F '#{pane_id}')"
 else
   # Right column already exists — split the last right-column pane vertically
-  LAST_PANE=$(( PANE_COUNT - 1 ))
-  tmux split-window -t "${SESSION}:0.${LAST_PANE}" -v -c "$PROJ"
-  NEW_PANE="$PANE_COUNT"
+  NEW_PANE_ID="$(tmux split-window -t "${LAST_PANE_ID}" -v -c "$PROJ" -P -F '#{pane_id}')"
 fi
 
 # Rebalance: Team Lead fills left column, agents stack on the right
-tmux select-pane   -t "${SESSION}:0.0"
-tmux select-layout -t "${SESSION}:0" main-vertical
+tmux select-pane   -t "${FIRST_PANE_ID}"
+tmux select-layout -t "${SESSION}:${WIN}" main-vertical
 
 # ── Set pane title ────────────────────────────────────────────────────────────
 
-tmux select-pane -t "${SESSION}:0.${NEW_PANE}" -T "[${AGENT_LABEL}]"
+tmux select-pane -t "${NEW_PANE_ID}" -T "[${AGENT_LABEL}]"
 
 # ── Launch claude ─────────────────────────────────────────────────────────────
 
-tmux send-keys -t "${SESSION}:0.${NEW_PANE}" "$AGENT_CMD" Enter
+tmux send-keys -t "${NEW_PANE_ID}" "$AGENT_CMD"
+tmux send-keys -t "${NEW_PANE_ID}" "" Enter
 
 echo "Waiting ${WAIT}s for claude to load..."
 sleep "$WAIT"
 
 # ── Start inbox watcher ───────────────────────────────────────────────────────
 
+# Resolve positional pane index for inbox-watcher (it uses session:win.pane syntax)
+NEW_PANE_IDX="$(tmux display-message -t "${NEW_PANE_ID}" -p '#{pane_index}')"
+
 WATCHER_SCRIPT="$(dirname "$0")/inbox-watcher.js"
 if [[ -f "$WATCHER_SCRIPT" ]]; then
-  node "$WATCHER_SCRIPT" "$SESSION" "$NEW_PANE" "$AGENT_LABEL" 2000 \
+  node "$WATCHER_SCRIPT" "$SESSION" "$NEW_PANE_IDX" "$AGENT_LABEL" 2000 \
     >> /tmp/inbox-watcher-${SESSION}.log 2>&1 &
-  echo "  inbox watcher: [${AGENT_LABEL}] → pane ${NEW_PANE}"
+  echo "  inbox watcher: [${AGENT_LABEL}] → pane ${NEW_PANE_IDX}"
 else
-  echo "  ⚠️  inbox-watcher.js not found — agent-to-agent messaging will not auto-deliver"
+  echo "  Warning: inbox-watcher.js not found — agent-to-agent messaging will not auto-deliver"
 fi
 
 # ── Send role prompt ──────────────────────────────────────────────────────────
 
 if [[ -n "$AGENT_PROMPT" ]]; then
-  tmux send-keys -t "${SESSION}:0.${NEW_PANE}" "$AGENT_PROMPT" Enter
+  tmux send-keys -t "${NEW_PANE_ID}" "$AGENT_PROMPT"
+  tmux send-keys -t "${NEW_PANE_ID}" "" Enter
 fi
 
 # Return focus to Team Lead
-tmux select-pane -t "${SESSION}:0.0"
+tmux select-pane -t "${FIRST_PANE_ID}"
 
-echo "[${AGENT_LABEL}] spawned in pane ${NEW_PANE}."
+echo "[${AGENT_LABEL}] spawned in pane ${NEW_PANE_IDX} (${NEW_PANE_ID})."
