@@ -133,9 +133,20 @@ fi
 tmux select-pane   -t "${FIRST_PANE_ID}"
 tmux select-layout -t "${SESSION}:${WIN}" main-vertical
 
-# ── Set pane title ────────────────────────────────────────────────────────────
+# ── Pane border labels ────────────────────────────────────────────────────────
+# Claude Code overwrites pane_title via OSC escape codes, so we use a custom
+# @agent user variable that only tmux can set, and display it in the border.
+# Enable border status + format once (idempotent — safe to call on every spawn).
 
-tmux select-pane -t "${NEW_PANE_ID}" -T "[${AGENT_LABEL}]"
+tmux set -t "${SESSION}:${WIN}" pane-border-status top
+tmux set -t "${SESSION}:${WIN}" pane-border-format " #{@agent} "
+tmux set -t "${SESSION}:${WIN}" allow-rename off
+
+# Stamp the new pane with its agent label (survives Claude's title rewrites)
+tmux set-option -pt "${NEW_PANE_ID}" @agent "(${AGENT_LABEL})"
+
+# Also set -T for any tools that read pane_title directly
+tmux select-pane -t "${NEW_PANE_ID}" -T "(${AGENT_LABEL})"
 
 # ── Launch claude ─────────────────────────────────────────────────────────────
 
