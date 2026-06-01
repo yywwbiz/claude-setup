@@ -66,6 +66,26 @@ The marketplace `path` in `.claude-plugin/marketplace.json` is absolute, so it o
 
 After install, the `/y-team:*` commands are available globally — in any project, any session.
 
+### Update
+
+Because the plugin is `source: directory`, it reads from disk on load — so updates are just: pull the latest, then tell Claude Code to reload.
+
+```bash
+# In the plugin directory
+cd /Users/yujungs700/dev/pet/claude-setup
+git pull
+```
+
+Then in any Claude Code session:
+
+```
+/reload-plugins
+```
+
+That's it. No uninstall/reinstall needed. Changes to `commands/`, `agents/`, `scripts/`, `.claude-plugin/plugin.json` all pick up after `/reload-plugins`.
+
+**Note:** `/plugin update` only works for git/URL-sourced plugins. Since this one is `source: directory`, you use `git pull` + `/reload-plugins` instead.
+
 ### Uninstall
 
 ```
@@ -75,7 +95,7 @@ After install, the `/y-team:*` commands are available globally — in any projec
 
 ### Iterating on the plugin itself
 
-If you're editing this plugin's files, just `/plugin uninstall` and `/plugin install` again to pick up changes — the marketplace `source: directory` reads from the live path on disk each time.
+If you're actively editing this plugin's files (not just pulling updates), `/reload-plugins` picks up the changes between turns. No need to uninstall/reinstall.
 
 ---
 
