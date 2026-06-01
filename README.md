@@ -51,18 +51,31 @@ Pick a small set per project. A typical web app might run `team-lead` + `product
 
 ---
 
-## Install
+## Install (local)
 
-The plugin is local for now (not on a marketplace). From a project where you want to use it:
+This plugin is local-only — it ships a marketplace manifest that points at the directory on disk. There's no remote install yet.
 
-```bash
-# In any Claude Code session:
-/plugin install /Users/yujungs700/dev/pet/claude-setup
+From any Claude Code session:
+
+```
+/plugin marketplace add /Users/yujungs700/dev/pet/claude-setup/.claude-plugin/marketplace.json
+/plugin install y-team@y-team-marketplace
 ```
 
-(Adjust the path to wherever you cloned this repo.)
+The marketplace `path` in `.claude-plugin/marketplace.json` is absolute, so it only works on this machine and at this exact location. If you move the repo, edit `path` accordingly.
 
 After install, the `/y-team:*` commands are available globally — in any project, any session.
+
+### Uninstall
+
+```
+/plugin uninstall y-team@y-team-marketplace
+/plugin marketplace remove y-team-marketplace
+```
+
+### Iterating on the plugin itself
+
+If you're editing this plugin's files, just `/plugin uninstall` and `/plugin install` again to pick up changes — the marketplace `source: directory` reads from the live path on disk each time.
 
 ---
 
