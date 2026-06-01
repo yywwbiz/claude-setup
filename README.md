@@ -81,33 +81,40 @@ If you're editing this plugin's files, just `/plugin uninstall` and `/plugin ins
 
 ## Use it on a project
 
-1. From the project directory, in any Claude Code session:
+### First-time kickoff (recommended)
+
+From a fresh project directory:
+
+```
+/y-team:init
+```
+
+This walks you through a short conversational kickoff: what you're building, who it's for, any constraints. Based on your answers it proposes a roster, scaffolds `CLAUDE.md` and `.claude/team.json`, and offers to boot the tmux session. One command, project ready.
+
+### Manual setup (if you prefer)
+
+1. List available personas:
    ```
    /y-team:list
    ```
-   Shows available personas and the project's active roster (empty on first use).
 
-2. Add the personas you need. You can name them explicitly or let Claude infer from your conversation:
+2. Add what you need (explicitly or by inference):
    ```
    /y-team:add engineer-web
    /y-team:add               # infers from recent discussion
    ```
 
-3. Start the tmux session — boots Team Lead in pane 0:
+3. Start the tmux session:
    ```
    /y-team:start
    ```
-   Switch to that tmux session and start talking to Team Lead. Team Lead reads `.claude/team.json` and spawns agents as the phase needs them.
 
-4. Check session state any time:
-   ```
-   /y-team:status
-   ```
+### Day-to-day
 
-5. Stop when done:
-   ```
-   /y-team:stop
-   ```
+- Switch to the tmux session and talk to Team Lead. Team Lead reads `.claude/team.json` and spawns specialists as phases need them.
+- You can also talk to specialist panes directly when you want to be in the weeds (e.g. whiteboarding with product-architect). Team Lead stays in charge of gates and milestones.
+- `/y-team:status` shows the running session and live panes.
+- `/y-team:stop` kills the session.
 
 ---
 
@@ -115,6 +122,7 @@ If you're editing this plugin's files, just `/plugin uninstall` and `/plugin ins
 
 | Command | What it does |
 |---|---|
+| `/y-team:init` | Conversational project kickoff — gathers brief, proposes roster, scaffolds CLAUDE.md and team.json |
 | `/y-team:start` | Boot tmux session, launch Team Lead in pane 0 |
 | `/y-team:list` | Show library personas + this project's active roster |
 | `/y-team:add [persona]` | Add a persona to the active roster (infers from conversation if omitted) |
