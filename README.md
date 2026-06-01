@@ -1,8 +1,6 @@
-# claude-setup
+# y-team
 
-Templates for running a self-orchestrating Claude Code agent team in tmux.
-
-The human starts one session. The Team Lead agent decides which specialist agents are needed and spawns them itself — no manual pane management required.
+A Claude Code plugin for running a self-orchestrating agent team in tmux. You install it once and use it on any project. The Team Lead agent decides which specialists are needed and spawns them itself — no manual pane management.
 
 ---
 
@@ -12,16 +10,36 @@ The human starts one session. The Team Lead agent decides which specialist agent
 You (stakeholder)
     │
     ▼
-Team Lead  ──spawn──►  Architect
-(pane 0)   ──spawn──►  Engineer Web
-           ──spawn──►  QA Agent
-           ──spawn──►  SRE Agent
+Team Lead  ──spawn──►  Product-Architect
+(pane 0)   ──spawn──►  Engineer Web / iOS / Android / Backend
+           ──spawn──►  Designer
+           ──spawn──►  QA
+           ──spawn──►  SRE
 ```
 
 - **Team Lead** lives in the left pane. It's the only agent you talk to.
-- All other agents are spawned by the Team Lead on demand via `scripts/spawn-agent.sh`.
-- Agents signal back to the Team Lead when their work is done; the Team Lead gates each phase transition.
-- Agent-to-agent messages are delivered automatically by `scripts/inbox-watcher.js`.
+- The active roster (which personas are available for *this* project) lives in `.claude/team.json`.
+- All other agents are spawned by Team Lead on demand via the plugin's `spawn-agent.sh`.
+- Agents signal back to Team Lead when their work is done; Team Lead gates each phase transition.
+- Agent-to-agent messages are delivered automatically by `inbox-watcher.js`.
+
+---
+
+## Personas
+
+| Persona | When to add to a project |
+|---|---|
+| `team-lead` | Always — orchestrator. Implicit, no need to add. |
+| `product-architect` | Almost always — owns REQUIREMENTS.md and PLAN.md (merged PM + Architect role). |
+| `engineer-web` | Web frontend work. |
+| `engineer-ios` | iOS app work. |
+| `engineer-android` | Android app work. |
+| `engineer-backend` | API / services / data layer work. |
+| `designer` | UI work that needs flows, specs, accessibility planning. |
+| `qa` | Almost always — verifies acceptance criteria, writes integration + e2e tests. |
+| `sre` | Anything that deploys. Covers DevOps / CI-CD too. |
+
+Pick a small set per project. A typical web app might run `team-lead` + `product-architect` + `engineer-web` + `engineer-backend` + `qa` + `sre`. Mobile-only projects swap engineers accordingly.
 
 ---
 
@@ -30,99 +48,87 @@ Team Lead  ──spawn──►  Architect
 - [tmux](https://github.com/tmux/tmux)
 - [Claude Code CLI](https://claude.ai/code) (`claude` on PATH)
 - Node.js (for the inbox watcher)
-- [GSD](https://github.com/dnl-fm/get-shit-done-cc) installed in the project: `npx get-shit-done-cc@latest --claude --local`
 
 ---
 
-## Setup
+## Install
 
-### 1. Copy templates into your project
+The plugin is local for now (not on a marketplace). From a project where you want to use it:
 
 ```bash
-cp -r templates/. /path/to/your/project/
+# In any Claude Code session:
+/plugin install /Users/yujungs700/dev/pet/claude-setup
 ```
 
-This copies:
-```
-CLAUDE.md                  # project config — edit placeholders
-start-session.sh           # human entry point
-scripts/
-  spawn-agent.sh           # called by Team Lead to open agent panes
-  inbox-watcher.js         # delivers agent-to-agent messages
-personas/
-  team-lead.md
-  pm.md
-  architect.md
-  engineer-web.md
-  engineer-ios.md
-  engineer-android.md
-  qa.md
-  sre.md
-```
+(Adjust the path to wherever you cloned this repo.)
 
-### 2. Edit `CLAUDE.md`
+After install, the `/y-team:*` commands are available globally — in any project, any session.
 
-Replace the placeholders:
+---
 
-| Placeholder | Replace with |
+## Use it on a project
+
+1. From the project directory, in any Claude Code session:
+   ```
+   /y-team:list
+   ```
+   Shows available personas and the project's active roster (empty on first use).
+
+2. Add the personas you need. You can name them explicitly or let Claude infer from your conversation:
+   ```
+   /y-team:add engineer-web
+   /y-team:add               # infers from recent discussion
+   ```
+
+3. Start the tmux session — boots Team Lead in pane 0:
+   ```
+   /y-team:start
+   ```
+   Switch to that tmux session and start talking to Team Lead. Team Lead reads `.claude/team.json` and spawns agents as the phase needs them.
+
+4. Check session state any time:
+   ```
+   /y-team:status
+   ```
+
+5. Stop when done:
+   ```
+   /y-team:stop
+   ```
+
+---
+
+## Commands
+
+| Command | What it does |
 |---|---|
-| `{{PROJECT_NAME}}` | Your project name |
-| `{{SPEC_FILE}}` | Path to your main spec/design doc (e.g. `docs/SPEC.md`) |
-| `{{ENV_VAR_1}}` | Required env vars |
-| `{{SETUP_CMD}}` | Project setup command (e.g. `npm install`) |
-
-Comment out any agent roles you don't need in the `# AGENTS` block.
-
-### 3. Make scripts executable
-
-```bash
-chmod +x start-session.sh scripts/spawn-agent.sh
-```
-
-### 4. Start the session
-
-```bash
-./start-session.sh
-```
-
-This opens a tmux session with the Team Lead pane and launches `claude --dangerously-skip-permissions`. You're now talking to the Team Lead.
+| `/y-team:start` | Boot tmux session, launch Team Lead in pane 0 |
+| `/y-team:list` | Show library personas + this project's active roster |
+| `/y-team:add [persona]` | Add a persona to the active roster (infers from conversation if omitted) |
+| `/y-team:remove <persona>` | Remove a persona from the active roster |
+| `/y-team:status` | Show running session and live agent panes |
+| `/y-team:stop` | Kill the tmux session |
 
 ---
 
-## Agent roster
+## Project file layout (created by Team Lead during work)
 
-| Agent | File | When Team Lead spawns it |
-|---|---|---|
-| PM | `personas/pm.md` | Large projects with complex product requirements |
-| Architect | `personas/architect.md` | When phase context is ready and a PLAN.md is needed |
-| Engineer Web | `personas/engineer-web.md` | After PLAN.md is ready (web tasks assigned) |
-| Engineer iOS | `personas/engineer-ios.md` | After PLAN.md is ready (iOS tasks assigned) |
-| Engineer Android | `personas/engineer-android.md` | After PLAN.md is ready (Android tasks assigned) |
-| QA | `personas/qa.md` | After all assigned engineers signal completion |
-| SRE | `personas/sre.md` | After QA signals the phase is verified |
-
-PM is optional — skip it on smaller projects and let the Team Lead handle phase context directly.
-
----
-
-## How the Team Lead spawns agents
-
-The Team Lead calls `scripts/spawn-agent.sh` via its Bash tool:
-
-```bash
-./scripts/spawn-agent.sh <session> <agent-label>
+```
+your-project/
+├── .claude/
+│   └── team.json              # active roster for this project
+├── .planning/
+│   ├── ROADMAP.md             # phase order and status
+│   ├── STATE.md               # live blockers, decisions, open questions
+│   └── PHASE-<N>/
+│       ├── REQUIREMENTS.md    # user stories + acceptance criteria
+│       ├── DESIGN.md          # flows, specs, a11y (optional)
+│       ├── PLAN.md            # task breakdown + assignments
+│       └── VERIFICATION.md    # QA findings and sign-off
+└── ... (your code)
 ```
 
-- `session` — the tmux session name (printed when you ran `start-session.sh`)
-- `agent-label` — case-insensitive, partial match against the AGENTS block (e.g. `arch`, `eng web`, `qa`)
-
-The script:
-1. Verifies the session exists
-2. Matches the label against `CLAUDE.md`'s AGENTS block
-3. Splits a new pane, rebalances to main-vertical layout
-4. Launches `claude --dangerously-skip-permissions` in the new pane
-5. Starts the inbox watcher for that agent
-6. Sends the role prompt
+The `.planning/` convention is borrowed from GSD but the plugin does not depend on the GSD plugin — the personas have the phase lifecycle baked in.
 
 ---
 
@@ -144,4 +150,4 @@ Watcher logs go to `/tmp/inbox-watcher-<session>.log`.
 | Reattach | `tmux attach -t <session>` |
 | Switch panes | Click (mouse on) or `Ctrl+B` arrow keys |
 | Scroll in pane | Mouse scroll or `Ctrl+B [` then arrow keys |
-| Kill session | `tmux kill-session -t <session>` |
+| Kill session | `/y-team:stop` or `tmux kill-session -t <session>` |

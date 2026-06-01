@@ -1,0 +1,8 @@
+{
+  "name": "y-team",
+  "version": "0.1.0",
+  "description": "Self-orchestrating Claude Code agent team in tmux. Team Lead spawns specialists on demand from a configurable persona library.",
+  "author": {
+    "name": "Yujung Shen"
+  }
+}

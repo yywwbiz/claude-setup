@@ -8,11 +8,9 @@
 #   │   (agents spawned by TL)      │
 #   └───────────────────────────────┘
 #
-# Team Lead decides which agents are needed and spawns them via scripts/spawn-agent.sh.
-# You do not need to pass any agent labels. Just run this to open the project.
-#
+# Team Lead decides which agents are needed and spawns them via spawn-agent.sh.
 # Usage:
-#   ./start-session.sh [OPTIONS]
+#   start-session.sh [OPTIONS]
 #
 # Options:
 #   -s, --session NAME    tmux session name (default: basename of project dir)
@@ -21,13 +19,9 @@
 
 set -euo pipefail
 
-# ── Defaults ──────────────────────────────────────────────────────────────────
-
 PROJ="$(pwd)"
 SESSION="$(basename "$PROJ")"
 AGENT_CMD="claude --dangerously-skip-permissions"
-
-# ── Argument parsing ──────────────────────────────────────────────────────────
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -39,8 +33,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# ── Session setup ─────────────────────────────────────────────────────────────
-
 if tmux has-session -t "$SESSION" 2>/dev/null; then
   echo "Session '${SESSION}' already exists — attaching."
   tmux attach-session -t "$SESSION"
@@ -50,28 +42,19 @@ fi
 # Create session — pane 0 is the Team Lead (full window initially)
 tmux new-session -d -s "$SESSION" -x 220 -y 60 -c "$PROJ"
 
-# Enable mouse support (scroll, click, drag to resize panes)
 tmux set-option -t "$SESSION" mouse on
-
-# Show pane titles in the border above each pane
 tmux set-option -t "$SESSION" pane-border-status top
 tmux set-option -t "$SESSION" pane-border-format " #{pane_title} "
 
-# Name the Team Lead pane
 tmux select-pane -t "${SESSION}:0.0" -T "[Team Lead]"
 
-# Source user tmux config (picks up theme, status bar, etc.) — non-fatal if absent
 tmux source-file ~/.tmux.conf 2>/dev/null || true
-
-# ── Launch claude in Team Lead pane ──────────────────────────────────────────
 
 tmux send-keys -t "${SESSION}:0.0" "$AGENT_CMD" Enter
 
-# ── Attach ────────────────────────────────────────────────────────────────────
-
 echo ""
 echo "Session '${SESSION}' ready. You are now in the Team Lead pane."
-echo "Team Lead will spawn agents as needed via scripts/spawn-agent.sh"
+echo "Team Lead will spawn agents as needed via the y-team plugin scripts."
 echo "Mouse: enabled (scroll, click, drag to resize)"
 echo "Detach: Ctrl+B D"
 echo ""
