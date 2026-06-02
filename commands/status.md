@@ -1,28 +1,39 @@
 ---
-description: Show running tmux session info and live agent panes
+description: Show running tmux session info, live agent panes, and project progress
 ---
 
-Show the user the current y-team session state.
+Show the user the current y-team session state and project progress.
 
 Steps:
 
 1. Determine the expected session name: basename of the current project directory.
 
-2. Check if the tmux session exists via Bash:
+2. Read project state files (do all reads in parallel):
+   - `.planning/LAST_SESSION.md` — where things left off
+   - `.planning/ROADMAP.md` — phase list and statuses
+   - `.claude/team.json` — active roster
+
+3. Check if the tmux session exists:
    ```bash
    tmux has-session -t "<session>" 2>/dev/null && echo "running" || echo "stopped"
    ```
-
-3. If stopped: tell the user the session is not running and suggest `/y-team:start`. Stop.
 
 4. If running, list the panes:
    ```bash
    tmux list-panes -t "<session>" -F '#{pane_index} #{@agent} #{pane_title}'
    ```
 
-5. Show:
-   - Session name
-   - Number of panes
-   - Each pane's index and agent label (the `@agent` variable, or pane title as fallback)
+5. Output a single status block with two sections:
 
-6. Show the active roster from `.claude/team.json` for comparison — so the user can see which active personas are currently spawned vs. not.
+   **Project**
+   - Current phase and stage (from LAST_SESSION.md, or "not started" if absent)
+   - Last completed action and next action (from LAST_SESSION.md)
+   - Open blockers if any
+   - Phase list from ROADMAP.md: one line each showing phase name and status (done / active / pending)
+
+   **Team session** (`<session-name>`)
+   - "running" or "stopped — run /y-team:start to boot"
+   - If running: each live pane's agent label
+   - Active roster from team.json, marking which are currently spawned vs. not yet spawned
+
+Keep the output tight — this should be scannable in a few seconds, not a wall of text.
