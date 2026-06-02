@@ -33,6 +33,22 @@ while [[ $# -gt 0 ]]; do
 done
 
 WATCHER_SCRIPT="${CLAUDE_PLUGIN_ROOT}/scripts/inbox-watcher.js"
+TL_PERSONA_FILE="${CLAUDE_PLUGIN_ROOT}/agents/team-lead.md"
+
+# ── Extract Team Lead boot prompt from persona file ───────────────────────────
+
+TL_PROMPT=""
+if [[ -f "$TL_PERSONA_FILE" ]]; then
+  TL_PROMPT="$(awk '
+    /^## AGENTS block entry/ { inblock=1; next }
+    inblock && /^```/ { if (started) { exit } else { started=1; next } }
+    inblock && started && NF { print; exit }
+  ' "$TL_PERSONA_FILE")"
+  # Strip the "Team Lead | " label prefix, leaving just the prompt text
+  TL_PROMPT="${TL_PROMPT#*| }"
+  # Substitute project name
+  TL_PROMPT="${TL_PROMPT//\{\{PROJECT_NAME\}\}/$(basename "$PROJ")}"
+fi
 
 # ── Helper: start Team Lead in a given pane ───────────────────────────────────
 
@@ -46,11 +62,18 @@ start_team_lead() {
 
   tmux send-keys -t "$pane_id" "$AGENT_CMD" Enter
 
+  local wait_secs=5
+  echo "Waiting ${wait_secs}s for claude to load..."
+  sleep "$wait_secs"
+
   if [[ -f "$WATCHER_SCRIPT" ]]; then
-    sleep 3
     node "$WATCHER_SCRIPT" "$session" "$pane_id" "team-lead" 2000 \
       >> /tmp/inbox-watcher-${session}-team-lead.log 2>&1 &
     echo "  inbox watcher: [Team Lead] → ${pane_id}"
+  fi
+
+  if [[ -n "$TL_PROMPT" ]]; then
+    tmux send-keys -t "$pane_id" "$TL_PROMPT" Enter
   fi
 }
 
