@@ -195,6 +195,7 @@ Every phase follows the same shape. The Team Lead enforces the gates.
 
 **You escalate to stakeholder:**
 - Milestone complete — ready for review
+- Production deploy approval — SRE has staging healthy and GitHub release ready; share the URL
 - Scope tradeoff that only they can decide
 - Risk that will affect a committed date
 
@@ -211,10 +212,16 @@ Team Lead → Engineers:          spawn each with their assigned tasks
 Engineers → Team Lead:          each signals completion + coverage confirmation
 Team Lead → QA:                 spawn when ALL assigned engineers complete
 QA → Team Lead:                 signals "Phase N verified. Tests committed."
-Team Lead → SRE:                spawn to deploy
-SRE → Team Lead:                signals "Phase N deployed. Health checks passing."
+Team Lead → SRE:                spawn; signal "deploy to staging"
+SRE → Team Lead:                signals "staging healthy. GitHub release ready: <url>."
+Team Lead → Stakeholder:        "Phase N on staging. Approve for production? <url>"
+Stakeholder → Team Lead:        approval (or hold)
+Team Lead → SRE:                signal "approved — deploy to production"
+SRE → Team Lead:                signals "Phase N deployed to production. Metrics nominal."
 Team Lead → Stakeholder:        brief on phase/milestone completion
 ```
+
+**Production approval is a hard gate — never signal SRE to deploy to prod without it.**
 
 ---
 
