@@ -1,26 +1,21 @@
 #!/usr/bin/env zsh
-# start-session.sh — opens a tmux session with Team Lead in pane 0
+# start-session.sh — start Team Lead in a tmux window
 #
-# Layout after start:
-#   ┌───────────────────────────────┐
-#   │         [Team Lead]           │
-#   │   (you talk here)             │
-#   │   (agents spawned by TL)      │
-#   └───────────────────────────────┘
+# If already inside tmux: opens a new "Team Lead" window in the current session.
+# If not in tmux: creates a new named session and attaches to it.
 #
-# Team Lead decides which agents are needed and spawns them via spawn-agent.sh.
 # Usage:
 #   start-session.sh [OPTIONS]
 #
 # Options:
-#   -s, --session NAME    tmux session name (default: basename of project dir)
+#   -s, --session NAME    session name when creating a new one (default: basename of project dir)
 #   -p, --project PATH    project directory (default: pwd)
 #   -h, --help            show this help
 
 set -euo pipefail
 
 PROJ="$(pwd)"
-SESSION="$(basename "$PROJ")"
+SESSION_NAME="$(basename "$PROJ")"
 AGENT_CMD="claude --dangerously-skip-permissions"
 
 if [[ -z "${CLAUDE_PLUGIN_ROOT:-}" ]]; then
@@ -29,56 +24,87 @@ fi
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -s|--session) SESSION="$2"; shift 2 ;;
-    -p|--project) PROJ="$2"; SESSION="$(basename "$2")"; shift 2 ;;
+    -s|--session) SESSION_NAME="$2"; shift 2 ;;
+    -p|--project) PROJ="$2"; SESSION_NAME="$(basename "$2")"; shift 2 ;;
     -h|--help)    grep '^#' "$0" | head -30 | sed 's/^# \?//'; exit 0 ;;
     -*) echo "Unknown option: $1"; exit 1 ;;
     *)  echo "Unknown argument: $1"; exit 1 ;;
   esac
 done
 
-if tmux has-session -t "$SESSION" 2>/dev/null; then
-  echo "Session '${SESSION}' already exists — switching."
-  if [[ -n "${TMUX:-}" ]]; then
-    tmux switch-client -t "$SESSION"
-  else
-    tmux attach-session -t "$SESSION"
+WATCHER_SCRIPT="${CLAUDE_PLUGIN_ROOT}/scripts/inbox-watcher.js"
+
+# ── Helper: start Team Lead in a given pane ───────────────────────────────────
+
+start_team_lead() {
+  local session="$1" pane_id="$2"
+
+  tmux set-option -t "$session" pane-border-status top
+  tmux set-option -t "$session" pane-border-format " #{@agent} "
+  tmux set-option -t "$session" allow-rename off
+  tmux set-option -pt "$pane_id" @agent "[Team Lead]"
+
+  tmux send-keys -t "$pane_id" "$AGENT_CMD" Enter
+
+  if [[ -f "$WATCHER_SCRIPT" ]]; then
+    sleep 3
+    node "$WATCHER_SCRIPT" "$session" "$pane_id" "team-lead" 2000 \
+      >> /tmp/inbox-watcher-${session}-team-lead.log 2>&1 &
+    echo "  inbox watcher: [Team Lead] → ${pane_id}"
   fi
+}
+
+# ── Already inside tmux: open a new window in the current session ─────────────
+
+if [[ -n "${TMUX:-}" ]]; then
+  SESSION="$(tmux display-message -p '#S')"
+
+  # If a Team Lead window already exists, just switch to it
+  if tmux list-windows -t "$SESSION" -F '#{window_name}' 2>/dev/null | grep -qx 'Team Lead'; then
+    echo "Team Lead window already exists in '${SESSION}' — switching."
+    tmux select-window -t "${SESSION}:Team Lead"
+    exit 0
+  fi
+
+  WIN="$(tmux new-window -t "${SESSION}:" -n "Team Lead" -c "$PROJ" -P -F '#{window_index}')"
+  PANE_ID="$(tmux display-message -t "${SESSION}:${WIN}" -p '#{pane_id}')"
+
+  start_team_lead "$SESSION" "$PANE_ID"
+  tmux select-window -t "${SESSION}:${WIN}"
+
+  echo ""
+  echo "Team Lead window ready in session '${SESSION}'."
+  echo "Detach: Ctrl+B D"
   exit 0
 fi
 
-# Create session — pane 0 is the Team Lead (full window initially)
-tmux new-session -d -s "$SESSION" -x 220 -y 60 -c "$PROJ"
+# ── Not in tmux: create a new named session and attach ────────────────────────
 
+SESSION="$SESSION_NAME"
+
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+  echo "Session '${SESSION}' already exists — attaching."
+  tmux attach-session -t "$SESSION"
+  exit 0
+fi
+
+tmux new-session -d -s "$SESSION" -c "$PROJ"
 tmux set-option -t "$SESSION" mouse on
-tmux set-option -t "$SESSION" pane-border-status top
-tmux set-option -t "$SESSION" pane-border-format " #{pane_title} "
 
-tmux select-pane -t "${SESSION}:0.0" -T "[Team Lead]"
+# Use the actual first window index (respects user's base-index setting)
+WIN="$(tmux display-message -t "${SESSION}" -p '#{window_index}')"
+PANE_ID="$(tmux display-message -t "${SESSION}:${WIN}" -p '#{pane_id}')"
+
+# Rename the window
+tmux rename-window -t "${SESSION}:${WIN}" "Team Lead"
 
 tmux source-file ~/.tmux.conf 2>/dev/null || true
 
-tmux send-keys -t "${SESSION}:0.0" "$AGENT_CMD" Enter
-
-# Start inbox-watcher for Team Lead so spawned agents can signal back
-WATCHER_SCRIPT="${CLAUDE_PLUGIN_ROOT}/scripts/inbox-watcher.js"
-if [[ -f "$WATCHER_SCRIPT" ]]; then
-  sleep 3
-  node "$WATCHER_SCRIPT" "$SESSION" 0 "team-lead" 2000 \
-    >> /tmp/inbox-watcher-${SESSION}-team-lead.log 2>&1 &
-  echo "  inbox watcher: [Team Lead] → pane 0"
-fi
+start_team_lead "$SESSION" "$PANE_ID"
 
 echo ""
 echo "Session '${SESSION}' ready."
 echo "Mouse: enabled (scroll, click, drag to resize)"
 echo "Detach: Ctrl+B D"
 echo ""
-
-# switch-client moves the current tmux client to the new session (no nesting).
-# attach-session is for when we're not inside tmux at all.
-if [[ -n "${TMUX:-}" ]]; then
-  tmux switch-client -t "$SESSION"
-else
-  tmux attach-session -t "$SESSION"
-fi
+tmux attach-session -t "$SESSION"

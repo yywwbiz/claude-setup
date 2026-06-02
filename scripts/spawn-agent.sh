@@ -164,9 +164,9 @@ NEW_PANE_IDX="$(tmux display-message -t "${NEW_PANE_ID}" -p '#{pane_index}')"
 
 WATCHER_SCRIPT="${CLAUDE_PLUGIN_ROOT}/scripts/inbox-watcher.js"
 if [[ -f "$WATCHER_SCRIPT" ]]; then
-  node "$WATCHER_SCRIPT" "$SESSION" "$NEW_PANE_IDX" "$AGENT_LABEL" 2000 \
+  node "$WATCHER_SCRIPT" "$SESSION" "$NEW_PANE_ID" "$AGENT_LABEL" 2000 \
     >> /tmp/inbox-watcher-${SESSION}.log 2>&1 &
-  echo "  inbox watcher: [${AGENT_LABEL}] → pane ${NEW_PANE_IDX}"
+  echo "  inbox watcher: [${AGENT_LABEL}] → ${NEW_PANE_ID} (pane ${NEW_PANE_IDX})"
 else
   echo "  Warning: inbox-watcher.js not found at ${WATCHER_SCRIPT}"
 fi

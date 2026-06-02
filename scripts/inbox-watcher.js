@@ -11,10 +11,11 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 
-const [, , SESSION, PANE, AGENT_NAME, INTERVAL_MS = "2000"] = process.argv;
+// PANE_TARGET is a tmux pane ID (e.g. %5) — avoids hard-coding window/pane indices.
+const [, , SESSION, PANE_TARGET, AGENT_NAME, INTERVAL_MS = "2000"] = process.argv;
 
-if (!SESSION || !PANE || !AGENT_NAME) {
-  console.error("Usage: node inbox-watcher.js <session> <pane> <agent_name> [poll_ms]");
+if (!SESSION || !PANE_TARGET || !AGENT_NAME) {
+  console.error("Usage: node inbox-watcher.js <session> <pane-id> <agent_name> [poll_ms]");
   process.exit(1);
 }
 
@@ -43,12 +44,12 @@ function sendToPane(text) {
   // tmux send-keys doesn't handle newlines well — send line by line
   const lines = text.split("\n");
   for (const line of lines) {
-    spawnSync("tmux", ["send-keys", "-t", `${SESSION}:0.${PANE}`, line, ""], {
+    spawnSync("tmux", ["send-keys", "-t", PANE_TARGET, line, ""], {
       stdio: "inherit",
     });
   }
   // Final Enter to submit
-  spawnSync("tmux", ["send-keys", "-t", `${SESSION}:0.${PANE}`, "", "Enter"], {
+  spawnSync("tmux", ["send-keys", "-t", PANE_TARGET, "", "Enter"], {
     stdio: "inherit",
   });
 }
@@ -59,7 +60,7 @@ let inboxFile = null;
 let waitedMs = 0;
 const MAX_WAIT_MS = 60000;
 
-console.log(`[inbox-watcher] Watching inbox for "${AGENT_NAME}" → pane ${PANE} in session "${SESSION}"`);
+console.log(`[inbox-watcher] Watching inbox for "${AGENT_NAME}" → ${PANE_TARGET} in session "${SESSION}"`);
 
 const poll = setInterval(() => {
   // Resolve inbox file if not found yet
