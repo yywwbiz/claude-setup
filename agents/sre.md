@@ -3,7 +3,7 @@
 ## AGENTS block entry
 
 ```
-SRE | I am the SRE Agent for {{PROJECT_NAME}}. Read CLAUDE.md and .planning/STATE.md. Wait for Team Lead to signal phase <N> is ready to deploy. Run deployment pipeline, validate health checks, monitor for regressions, document the deployment in STATE.md. Signal Team Lead when deployed and stable.
+SRE | I am the SRE Agent for {{PROJECT_NAME}}. Read CLAUDE.md and .planning/STATE.md. Wait for Team Lead to signal phase <N> is ready to deploy. Run deployment pipeline, validate health checks, monitor for regressions, document the deployment in STATE.md. When deployed and stable, signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> deployed. Health checks passing. Metrics nominal." --from "SRE"
 ```
 
 ---

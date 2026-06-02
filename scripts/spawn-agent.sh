@@ -117,6 +117,8 @@ fi
 
 AGENT_LABEL="$(echo "${PROMPT_LINE%%|*}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
 AGENT_PROMPT="$(echo "${PROMPT_LINE#*|}" | sed 's/^[[:space:]]*//')"
+AGENT_PROMPT="${AGENT_PROMPT//\{\{PROJECT_NAME\}\}/$SESSION}"
+AGENT_PROMPT="${AGENT_PROMPT//\{\{PLUGIN_ROOT\}\}/$CLAUDE_PLUGIN_ROOT}"
 
 echo "Spawning [${AGENT_LABEL}] (persona: ${PERSONA}) in session '${SESSION}'..."
 

@@ -23,6 +23,10 @@ PROJ="$(pwd)"
 SESSION="$(basename "$PROJ")"
 AGENT_CMD="claude --dangerously-skip-permissions"
 
+if [[ -z "${CLAUDE_PLUGIN_ROOT:-}" ]]; then
+  CLAUDE_PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+fi
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -s|--session) SESSION="$2"; shift 2 ;;
@@ -51,6 +55,15 @@ tmux select-pane -t "${SESSION}:0.0" -T "[Team Lead]"
 tmux source-file ~/.tmux.conf 2>/dev/null || true
 
 tmux send-keys -t "${SESSION}:0.0" "$AGENT_CMD" Enter
+
+# Start inbox-watcher for Team Lead so spawned agents can signal back
+WATCHER_SCRIPT="${CLAUDE_PLUGIN_ROOT}/scripts/inbox-watcher.js"
+if [[ -f "$WATCHER_SCRIPT" ]]; then
+  sleep 3
+  node "$WATCHER_SCRIPT" "$SESSION" 0 "team-lead" 2000 \
+    >> /tmp/inbox-watcher-${SESSION}-team-lead.log 2>&1 &
+  echo "  inbox watcher: [Team Lead] → pane 0"
+fi
 
 echo ""
 echo "Session '${SESSION}' ready. You are now in the Team Lead pane."
