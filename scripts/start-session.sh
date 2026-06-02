@@ -38,8 +38,12 @@ while [[ $# -gt 0 ]]; do
 done
 
 if tmux has-session -t "$SESSION" 2>/dev/null; then
-  echo "Session '${SESSION}' already exists — attaching."
-  tmux attach-session -t "$SESSION"
+  echo "Session '${SESSION}' already exists — switching."
+  if [[ -n "${TMUX:-}" ]]; then
+    tmux switch-client -t "$SESSION"
+  else
+    tmux attach-session -t "$SESSION"
+  fi
   exit 0
 fi
 
@@ -66,9 +70,15 @@ if [[ -f "$WATCHER_SCRIPT" ]]; then
 fi
 
 echo ""
-echo "Session '${SESSION}' ready. You are now in the Team Lead pane."
-echo "Team Lead will spawn agents as needed via the y-team plugin scripts."
+echo "Session '${SESSION}' ready."
 echo "Mouse: enabled (scroll, click, drag to resize)"
 echo "Detach: Ctrl+B D"
 echo ""
-tmux attach-session -t "$SESSION"
+
+# switch-client moves the current tmux client to the new session (no nesting).
+# attach-session is for when we're not inside tmux at all.
+if [[ -n "${TMUX:-}" ]]; then
+  tmux switch-client -t "$SESSION"
+else
+  tmux attach-session -t "$SESSION"
+fi
