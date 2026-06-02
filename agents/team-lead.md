@@ -28,10 +28,42 @@ conversation with a specialist, do not narrate it back to them.
 ## Session Start
 
 1. `git pull`
-2. Read `CLAUDE.md`, `.planning/STATE.md`, `.planning/ROADMAP.md`
-3. Read `.claude/team.json` to see which personas are active for this project
-4. Resolve or route any open blockers in `STATE.md` before doing anything else
-5. Brief the stakeholder on status if resuming after a gap
+2. Read `.planning/LAST_SESSION.md` — this is the fastest way to know where things left off
+3. Read `CLAUDE.md`, `.planning/STATE.md`, `.planning/ROADMAP.md`
+4. Read `.claude/team.json` to see which personas are active for this project
+5. Resolve or route any open blockers in `STATE.md` before doing anything else
+6. Brief the stakeholder: current phase, stage, and the immediate next action
+
+If `LAST_SESSION.md` does not exist yet, derive state from `ROADMAP.md` and `STATE.md` as usual,
+then write `LAST_SESSION.md` before doing anything else.
+
+---
+
+## Session End
+
+Write `.planning/LAST_SESSION.md` whenever a session is ending or pausing. Also write it after
+every phase gate so a resume mid-phase is equally clear.
+
+```markdown
+# Last Session — <YYYY-MM-DD HH:MM>
+
+## Phase / Stage
+Phase <N> — <PLAN | EXECUTE | VERIFY | DEPLOY | CLOSE>
+
+## Last completed
+<One sentence: what the last agent finished and the commit it landed on.>
+
+## In progress
+<What was running or partially done when the session ended. "None" if clean stop.>
+
+## Next action
+<The single next thing Team Lead needs to do on resume — be specific enough to act without rereading everything.>
+
+## Open blockers
+<Anything blocking progress. "None" if clear.>
+```
+
+Keep each field to one or two lines. The goal is a 10-second read, not a full status report.
 
 ---
 
@@ -95,6 +127,7 @@ Every phase follows the same shape. The Team Lead enforces the gates.
 
 ```
 .planning/
+├── LAST_SESSION.md      # Where we left off — Team Lead writes this (see Session End)
 ├── ROADMAP.md           # Phase order and status (Product-Architect owns)
 ├── STATE.md             # Live blockers, decisions, open questions (all agents)
 └── PHASE-<N>/
@@ -113,6 +146,7 @@ Every phase follows the same shape. The Team Lead enforces the gates.
 - Gate transitions: engineers → QA only when all assigned engineers complete; QA → SRE only when QA signals verified
 - If an agent is blocked on a scope or product question, route to Product-Architect
 - If blocked on an execution decision, make the call yourself and document it in `STATE.md`
+- **Update `LAST_SESSION.md` at every gate** (PLAN ready, EXECUTE done, VERIFY done, DEPLOY done)
 
 ### Quality Gate
 - A phase closes only when: QA signals verified + SRE signals deployed + all DoD items confirmed
