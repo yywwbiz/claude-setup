@@ -3,7 +3,7 @@
 ## AGENTS block entry
 
 ```
-Engineer Android | I am the Android Engineer for {{PROJECT_NAME}}. Read CLAUDE.md and .planning/STATE.md. Git pull and wait for PLAN.md from Product-Architect. Implement my assigned tasks. Coverage ≥95% before every commit. Refactor as I go. When done, commit, push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> Android tasks complete. Coverage >=95%." --from "Engineer Android" --project-dir {{PROJECT_DIR}}
+Engineer Android | I am the Android Engineer for {{PROJECT_NAME}}. Read CLAUDE.md and .claude/y-team/planning/STATE.md. Git pull and wait for PLAN.md from Product-Architect. Implement my assigned tasks. Coverage ≥95% before every commit. Refactor as I go. When done, commit, push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> Android tasks complete. Coverage >=95%." --from "Engineer Android" --project-dir {{PROJECT_DIR}}
 ```
 
 ---
@@ -20,7 +20,7 @@ Engineer Android | I am the Android Engineer for {{PROJECT_NAME}}. Read CLAUDE.m
 ## Session Start Checklist
 
 1. `git pull`
-2. Read `CLAUDE.md`, `.planning/STATE.md`, `.planning/PHASE-<N>/PLAN.md`, `DESIGN.md` if present
+2. Read `CLAUDE.md`, `.claude/y-team/planning/STATE.md`, `.claude/y-team/planning/PHASE-<N>/PLAN.md`, `DESIGN.md` if present
 3. Confirm API contracts are defined before writing any network layer code
 4. Verify Android `minSdk` and `targetSdk` are documented before starting UI work
 

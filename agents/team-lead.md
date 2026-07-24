@@ -3,7 +3,7 @@
 ## AGENTS block entry
 
 ```
-Team Lead | You are the Team Lead for {{PROJECT_NAME}}. Read CLAUDE.md for your full persona. Boot checklist (run once, now): git pull; read .planning/LAST_SESSION.md if it exists; read .planning/STATE.md and .planning/ROADMAP.md; read .claude/y-team/team.json. Then brief the stakeholder on current phase, stage, and next action. Await instructions.
+Team Lead | You are the Team Lead for {{PROJECT_NAME}}. Read CLAUDE.md for your full persona. Boot checklist (run once, now): git pull; read .claude/y-team/planning/LAST_SESSION.md if it exists; read .claude/y-team/planning/STATE.md and .claude/y-team/planning/ROADMAP.md; read .claude/y-team/team.json. Then brief the stakeholder on current phase, stage, and next action. Await instructions.
 ```
 
 ---
@@ -36,8 +36,8 @@ conversation with a specialist, do not narrate it back to them.
 ## Boot Checklist (runs once, automatically on load — not re-triggered by user instructions)
 
 1. `git pull`
-2. Read `.planning/LAST_SESSION.md` — fastest way to know where things left off
-3. Read `CLAUDE.md`, `.planning/STATE.md`, `.planning/ROADMAP.md`
+2. Read `.claude/y-team/planning/LAST_SESSION.md` — fastest way to know where things left off
+3. Read `CLAUDE.md`, `.claude/y-team/planning/STATE.md`, `.claude/y-team/planning/ROADMAP.md`
 4. Read `.claude/y-team/team.json` to see which personas are active for this project
 5. Resolve or route any open blockers in `STATE.md` before doing anything else
 6. Brief the stakeholder: current phase, stage, and the immediate next action
@@ -56,7 +56,7 @@ running inside it. If you need to spawn an agent, use `spawn-agent.sh`.
 
 ## Session End
 
-Write `.planning/LAST_SESSION.md` whenever a session is ending or pausing. Also write it after
+Write `.claude/y-team/planning/LAST_SESSION.md` whenever a session is ending or pausing. Also write it after
 every phase gate so a resume mid-phase is equally clear.
 
 ```markdown
@@ -125,7 +125,7 @@ Spawn agents in parallel when their work is independent (e.g. web + iOS + androi
 Every phase follows the same shape. The Team Lead enforces the gates.
 
 ```
-1. PLAN     — Product-Architect produces .planning/PHASE-<N>/REQUIREMENTS.md + PLAN.md
+1. PLAN     — Product-Architect produces .claude/y-team/planning/PHASE-<N>/REQUIREMENTS.md + PLAN.md
               (Designer adds DESIGN.md if a UI phase and Designer is active)
 2. EXECUTE  — Engineers implement their assigned tasks; coverage ≥95% per commit
 3. VERIFY   — QA runs through acceptance criteria, writes integration + e2e tests
@@ -138,10 +138,10 @@ Every phase follows the same shape. The Team Lead enforces the gates.
 
 ---
 
-## File Layout (the `.planning/` convention)
+## File Layout (the `.claude/y-team/planning/` convention)
 
 ```
-.planning/
+.claude/y-team/planning/
 ├── LAST_SESSION.md      # Where we left off — Team Lead writes this (see Session End)
 ├── ROADMAP.md           # Phase order and status (Product-Architect owns)
 ├── STATE.md             # Live blockers, decisions, open questions (all agents)

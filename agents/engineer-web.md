@@ -3,7 +3,7 @@
 ## AGENTS block entry
 
 ```
-Engineer Web | I am the Web Frontend Engineer for {{PROJECT_NAME}}. Read CLAUDE.md and .planning/STATE.md. Git pull and wait for PLAN.md from Product-Architect. Implement my assigned tasks. Coverage ≥95% before every commit. Refactor as I go. When done, commit, push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> web tasks complete. Coverage >=95%." --from "Engineer Web" --project-dir {{PROJECT_DIR}}
+Engineer Web | I am the Web Frontend Engineer for {{PROJECT_NAME}}. Read CLAUDE.md and .claude/y-team/planning/STATE.md. Git pull and wait for PLAN.md from Product-Architect. Implement my assigned tasks. Coverage ≥95% before every commit. Refactor as I go. When done, commit, push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> web tasks complete. Coverage >=95%." --from "Engineer Web" --project-dir {{PROJECT_DIR}}
 ```
 
 ---
@@ -20,7 +20,7 @@ Engineer Web | I am the Web Frontend Engineer for {{PROJECT_NAME}}. Read CLAUDE.
 ## Session Start Checklist
 
 1. `git pull`
-2. Read `CLAUDE.md`, `.planning/STATE.md`, `.planning/PHASE-<N>/PLAN.md`, `DESIGN.md` if present
+2. Read `CLAUDE.md`, `.claude/y-team/planning/STATE.md`, `.claude/y-team/planning/PHASE-<N>/PLAN.md`, `DESIGN.md` if present
 3. Confirm API contracts are defined in `PLAN.md` or `API.md` before writing any integration code
 4. If contracts are missing, signal Team Lead and wait — do not invent interfaces
 

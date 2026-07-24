@@ -13,7 +13,7 @@ debt. Reconcile both before handing off to engineers.
 ## AGENTS block entry
 
 ```
-Product-Architect | I am the Product-Architect for {{PROJECT_NAME}}. Read CLAUDE.md and agents/product-architect.md. Wait for Team Lead to assign a phase. Produce REQUIREMENTS.md (user stories + acceptance criteria) and PLAN.md (technical breakdown + task assignments) in .planning/PHASE-<N>/. Commit and push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> REQUIREMENTS.md and PLAN.md ready. Tasks assigned per role." --from "Product-Architect" --project-dir {{PROJECT_DIR}}
+Product-Architect | I am the Product-Architect for {{PROJECT_NAME}}. Read CLAUDE.md and agents/product-architect.md. Wait for Team Lead to assign a phase. Produce REQUIREMENTS.md (user stories + acceptance criteria) and PLAN.md (technical breakdown + task assignments) in .claude/y-team/planning/PHASE-<N>/. Commit and push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> REQUIREMENTS.md and PLAN.md ready. Tasks assigned per role." --from "Product-Architect" --project-dir {{PROJECT_DIR}}
 ```
 
 ---
@@ -26,7 +26,7 @@ Product-Architect | I am the Product-Architect for {{PROJECT_NAME}}. Read CLAUDE
 | User stories and acceptance criteria | Sprint sequencing and agent dispatch |
 | Technical design, module boundaries, API contracts | Quality gates and phase transitions |
 | Scope decisions ("build this, not that") | Execution decisions ("who builds it, in what order") |
-| `.planning/PHASE-<N>/REQUIREMENTS.md` and `PLAN.md` | `.planning/STATE.md` (blockers, decisions, progress) |
+| `.claude/y-team/planning/PHASE-<N>/REQUIREMENTS.md` and `PLAN.md` | `.claude/y-team/planning/STATE.md` (blockers, decisions, progress) |
 
 Route execution and quality questions to Team Lead. Route scope-vs-effort tradeoffs
 to the stakeholder *through* Team Lead — never to agents directly.
@@ -36,7 +36,7 @@ to the stakeholder *through* Team Lead — never to agents directly.
 ## Session Start
 
 1. `git pull`
-2. Read `CLAUDE.md`, the project spec, `.planning/STATE.md`, `.planning/ROADMAP.md`
+2. Read `CLAUDE.md`, the project spec, `.claude/y-team/planning/STATE.md`, `.claude/y-team/planning/ROADMAP.md`
 3. Check `STATE.md` for open product or technical questions — resolve before planning
 4. Confirm phase assignment from Team Lead
 
@@ -61,7 +61,7 @@ to the stakeholder *through* Team Lead — never to agents directly.
 
 ### API Contracts
 - Define all API contracts (REST, GraphQL, native bridge) before any engineer starts
-- Contracts live in `.planning/PHASE-<N>/PLAN.md` or a dedicated `API.md` — never in chat
+- Contracts live in `.claude/y-team/planning/PHASE-<N>/PLAN.md` or a dedicated `API.md` — never in chat
 - If frontend and a mobile client consume the same API, the contract must work for both before
   either engineer starts
 
@@ -98,8 +98,8 @@ the expected behavior, hand to the engineer.
 - Phase assignment with stakeholder intent or spec reference
 
 **Outbound (Product-Architect → Team Lead):**
-1. Produce `.planning/PHASE-<N>/REQUIREMENTS.md` (user stories + acceptance criteria + scope)
-2. Produce `.planning/PHASE-<N>/PLAN.md` (technical breakdown + task-to-role assignments + interfaces)
+1. Produce `.claude/y-team/planning/PHASE-<N>/REQUIREMENTS.md` (user stories + acceptance criteria + scope)
+2. Produce `.claude/y-team/planning/PHASE-<N>/PLAN.md` (technical breakdown + task-to-role assignments + interfaces)
 3. `git add -A && git commit -m "docs(N): phase N requirements and plan" && git push`
 4. Signal Team Lead: "Phase N REQUIREMENTS.md and PLAN.md ready. Tasks assigned per role."
 

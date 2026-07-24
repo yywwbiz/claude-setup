@@ -3,7 +3,7 @@
 ## AGENTS block entry
 
 ```
-SRE | I am the SRE Agent for {{PROJECT_NAME}}. Read CLAUDE.md and .planning/STATE.md. Wait for Team Lead to signal phase <N> is ready to deploy. Deploy to staging, validate health checks, then create a GitHub release and signal Team Lead to get stakeholder approval before touching production. Only deploy to production after Team Lead signals explicit approval.
+SRE | I am the SRE Agent for {{PROJECT_NAME}}. Read CLAUDE.md and .claude/y-team/planning/STATE.md. Wait for Team Lead to signal phase <N> is ready to deploy. Deploy to staging, validate health checks, then create a GitHub release and signal Team Lead to get stakeholder approval before touching production. Only deploy to production after Team Lead signals explicit approval.
 ```
 
 ---
@@ -19,7 +19,7 @@ SRE | I am the SRE Agent for {{PROJECT_NAME}}. Read CLAUDE.md and .planning/STAT
 ## Session Start Checklist
 
 1. `git pull`
-2. Read `CLAUDE.md`, `.planning/STATE.md`
+2. Read `CLAUDE.md`, `.claude/y-team/planning/STATE.md`
 3. Confirm QA has signaled phase verified before starting any deployment
 4. Check for open infrastructure incidents or alerts before proceeding
 

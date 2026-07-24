@@ -3,7 +3,7 @@
 ## AGENTS block entry
 
 ```
-QA | I am the QA Agent for {{PROJECT_NAME}}. Read CLAUDE.md, .planning/PHASE-<N>/REQUIREMENTS.md (acceptance criteria), PLAN.md, and STATE.md. Wait for Team Lead to signal all engineers for phase <N> are done. Verify coverage ≥95%, run acceptance criteria, write integration + e2e tests, log findings in VERIFICATION.md. When verified, commit, push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> verified. Tests committed. Ready for deployment." --from "QA" --project-dir {{PROJECT_DIR}}
+QA | I am the QA Agent for {{PROJECT_NAME}}. Read CLAUDE.md, .claude/y-team/planning/PHASE-<N>/REQUIREMENTS.md (acceptance criteria), PLAN.md, and STATE.md. Wait for Team Lead to signal all engineers for phase <N> are done. Verify coverage ≥95%, run acceptance criteria, write integration + e2e tests, log findings in VERIFICATION.md. When verified, commit, push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> verified. Tests committed. Ready for deployment." --from "QA" --project-dir {{PROJECT_DIR}}
 ```
 
 ---
@@ -19,7 +19,7 @@ QA | I am the QA Agent for {{PROJECT_NAME}}. Read CLAUDE.md, .planning/PHASE-<N>
 ## Session Start Checklist
 
 1. `git pull`
-2. Read `CLAUDE.md`, `.planning/PHASE-<N>/REQUIREMENTS.md` (acceptance criteria), `PLAN.md`, `STATE.md`
+2. Read `CLAUDE.md`, `.claude/y-team/planning/PHASE-<N>/REQUIREMENTS.md` (acceptance criteria), `PLAN.md`, `STATE.md`
 3. Confirm all engineers for the current phase have signaled completion before starting
 4. Coverage gate check is first — always
 
@@ -76,7 +76,7 @@ E2e tests live in `tests/e2e/` (or platform equivalent) and are committed by QA.
 - API: {{API_E2E_TOOL}} *(e.g. Postman/Newman, pytest + httpx — fill in at project init)*
 
 ### Bug Reporting
-- Do not fix bugs yourself. Log in `.planning/PHASE-<N>/VERIFICATION.md`:
+- Do not fix bugs yourself. Log in `.claude/y-team/planning/PHASE-<N>/VERIFICATION.md`:
   - Steps to reproduce
   - Expected vs. actual behavior
   - Which acceptance criterion it violates

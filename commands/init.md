@@ -90,9 +90,9 @@ The active roster lives in `.claude/y-team/team.json`. Team Lead reads it before
 
 ## Project Files
 
-- `.planning/ROADMAP.md` — phase order and status (created when first phase is planned)
-- `.planning/STATE.md` — live blockers, decisions, open questions
-- `.planning/PHASE-<N>/` — per-phase REQUIREMENTS.md, PLAN.md, VERIFICATION.md
+- `.claude/y-team/planning/ROADMAP.md` — phase order and status (created when first phase is planned)
+- `.claude/y-team/planning/STATE.md` — live blockers, decisions, open questions
+- `.claude/y-team/planning/PHASE-<N>/` — per-phase REQUIREMENTS.md, PLAN.md, VERIFICATION.md
 
 ## Standing Rules
 
@@ -108,7 +108,7 @@ The active roster lives in `.claude/y-team/team.json`. Team Lead reads it before
 _Maintained by Team Lead. One entry per completed task, bug fix, and phase gate — newest at the bottom._
 ```
 
-Do NOT create `.planning/` files. Team Lead and product-architect will create those when the first phase begins (light scaffolding mode).
+Do NOT create `.claude/y-team/planning/` files. Team Lead and product-architect will create those when the first phase begins (light scaffolding mode).
 
 ### 6. Offer to boot the session
 

@@ -9,8 +9,8 @@ Steps:
 1. Determine the expected session name: basename of the current project directory.
 
 2. Read project state files (do all reads in parallel):
-   - `.planning/LAST_SESSION.md` — where things left off
-   - `.planning/ROADMAP.md` — phase list and statuses
+   - `.claude/y-team/planning/LAST_SESSION.md` — where things left off
+   - `.claude/y-team/planning/ROADMAP.md` — phase list and statuses
    - `.claude/y-team/team.json` — active roster
 
 3. Check if the tmux session exists:
