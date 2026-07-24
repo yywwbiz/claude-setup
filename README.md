@@ -157,7 +157,8 @@ This walks you through a short conversational kickoff: what you're building, who
 ```
 your-project/
 ├── .claude/
-│   └── team.json              # active roster for this project
+│   ├── team.json              # active roster for this project
+│   └── y-team-inbox/          # agent-to-agent messages (runtime only, gitignored)
 ├── .planning/
 │   ├── ROADMAP.md             # phase order and status
 │   ├── STATE.md               # live blockers, decisions, open questions
@@ -175,9 +176,9 @@ The `.planning/` convention is borrowed from GSD but the plugin does not depend 
 
 ## Agent-to-agent messaging
 
-`scripts/inbox-watcher.js` polls each agent's inbox file in `~/.claude/teams/default/inboxes/` and feeds unread messages into the agent's tmux pane automatically.
+`scripts/inbox-watcher.js` polls each agent's inbox file and feeds unread messages into the agent's tmux pane automatically. `scripts/send-inbox.js` writes messages to an agent's inbox.
 
-Agents write to each other's inboxes using the Claude Code SendMessage tool. The watcher picks up the message and types it into the target pane.
+Inboxes are stored at `.claude/y-team-inbox/<agent-name>.json` inside the project directory — one inbox directory per project, never shared globally. Running y-team on two projects simultaneously keeps their agent communication completely separate. `/y-team:init` adds `.claude/y-team-inbox/` to `.gitignore` so inbox files are never committed.
 
 Watcher logs go to `/tmp/inbox-watcher-<session>.log`.
 

@@ -1,25 +1,25 @@
 #!/usr/bin/env node
 // inbox-watcher.js — polls a Claude Code agent inbox and feeds unread messages into a tmux pane
 //
-// Usage: node inbox-watcher.js <session> <pane> <agent_name> [poll_interval_ms]
+// Usage: node inbox-watcher.js <session> <pane> <agent_name> <project_dir> [poll_interval_ms]
 //
 // Resolves the inbox file by trying several name variants of agent_name.
 // Marks messages as read after sending them to the tmux pane.
+// Inbox lives at <project_dir>/.claude/y-team-inbox/ — project-local, never global.
 
-const { execSync, spawnSync } = require("child_process");
+const { spawnSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const os = require("os");
 
 // PANE_TARGET is a tmux pane ID (e.g. %5) — avoids hard-coding window/pane indices.
-const [, , SESSION, PANE_TARGET, AGENT_NAME, INTERVAL_MS = "2000"] = process.argv;
+const [, , SESSION, PANE_TARGET, AGENT_NAME, PROJECT_DIR, INTERVAL_MS = "2000"] = process.argv;
 
-if (!SESSION || !PANE_TARGET || !AGENT_NAME) {
-  console.error("Usage: node inbox-watcher.js <session> <pane-id> <agent_name> [poll_ms]");
+if (!SESSION || !PANE_TARGET || !AGENT_NAME || !PROJECT_DIR) {
+  console.error("Usage: node inbox-watcher.js <session> <pane-id> <agent_name> <project_dir> [poll_ms]");
   process.exit(1);
 }
 
-const INBOX_DIR = path.join(os.homedir(), ".claude", "teams", "default", "inboxes");
+const INBOX_DIR = path.join(PROJECT_DIR, ".claude", "y-team-inbox");
 const INTERVAL = parseInt(INTERVAL_MS, 10);
 
 // ── Resolve inbox file ────────────────────────────────────────────────────────
@@ -60,7 +60,7 @@ let inboxFile = null;
 let waitedMs = 0;
 const MAX_WAIT_MS = 60000;
 
-console.log(`[inbox-watcher] Watching inbox for "${AGENT_NAME}" → ${PANE_TARGET} in session "${SESSION}"`);
+console.log(`[inbox-watcher] Watching inbox for "${AGENT_NAME}" → ${PANE_TARGET} (project: ${PROJECT_DIR})`);
 
 const poll = setInterval(() => {
   // Resolve inbox file if not found yet

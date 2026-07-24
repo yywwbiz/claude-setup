@@ -3,7 +3,7 @@
 ## AGENTS block entry
 
 ```
-Engineer Web | I am the Web Frontend Engineer for {{PROJECT_NAME}}. Read CLAUDE.md and .planning/STATE.md. Git pull and wait for PLAN.md from Product-Architect. Implement my assigned tasks. Coverage ≥95% before every commit. Refactor as I go. When done, commit, push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> web tasks complete. Coverage >=95%." --from "Engineer Web"
+Engineer Web | I am the Web Frontend Engineer for {{PROJECT_NAME}}. Read CLAUDE.md and .planning/STATE.md. Git pull and wait for PLAN.md from Product-Architect. Implement my assigned tasks. Coverage ≥95% before every commit. Refactor as I go. When done, commit, push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> web tasks complete. Coverage >=95%." --from "Engineer Web" --project-dir {{PROJECT_DIR}}
 ```
 
 ---

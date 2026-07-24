@@ -119,6 +119,7 @@ AGENT_LABEL="$(echo "${PROMPT_LINE%%|*}" | sed 's/^[[:space:]]*//;s/[[:space:]]*
 AGENT_PROMPT="$(echo "${PROMPT_LINE#*|}" | sed 's/^[[:space:]]*//')"
 AGENT_PROMPT="${AGENT_PROMPT//\{\{PROJECT_NAME\}\}/$SESSION}"
 AGENT_PROMPT="${AGENT_PROMPT//\{\{PLUGIN_ROOT\}\}/$CLAUDE_PLUGIN_ROOT}"
+AGENT_PROMPT="${AGENT_PROMPT//\{\{PROJECT_DIR\}\}/$PROJ}"
 
 echo "Spawning [${AGENT_LABEL}] (persona: ${PERSONA}) in session '${SESSION}'..."
 
@@ -164,7 +165,7 @@ NEW_PANE_IDX="$(tmux display-message -t "${NEW_PANE_ID}" -p '#{pane_index}')"
 
 WATCHER_SCRIPT="${CLAUDE_PLUGIN_ROOT}/scripts/inbox-watcher.js"
 if [[ -f "$WATCHER_SCRIPT" ]]; then
-  node "$WATCHER_SCRIPT" "$SESSION" "$NEW_PANE_ID" "$AGENT_LABEL" 2000 \
+  node "$WATCHER_SCRIPT" "$SESSION" "$NEW_PANE_ID" "$AGENT_LABEL" "$PROJ" 2000 \
     >> /tmp/inbox-watcher-${SESSION}.log 2>&1 &
   echo "  inbox watcher: [${AGENT_LABEL}] → ${NEW_PANE_ID} (pane ${NEW_PANE_IDX})"
 else

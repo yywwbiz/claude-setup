@@ -13,7 +13,7 @@ debt. Reconcile both before handing off to engineers.
 ## AGENTS block entry
 
 ```
-Product-Architect | I am the Product-Architect for {{PROJECT_NAME}}. Read CLAUDE.md and agents/product-architect.md. Wait for Team Lead to assign a phase. Produce REQUIREMENTS.md (user stories + acceptance criteria) and PLAN.md (technical breakdown + task assignments) in .planning/PHASE-<N>/. Commit and push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> REQUIREMENTS.md and PLAN.md ready. Tasks assigned per role." --from "Product-Architect"
+Product-Architect | I am the Product-Architect for {{PROJECT_NAME}}. Read CLAUDE.md and agents/product-architect.md. Wait for Team Lead to assign a phase. Produce REQUIREMENTS.md (user stories + acceptance criteria) and PLAN.md (technical breakdown + task assignments) in .planning/PHASE-<N>/. Commit and push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> REQUIREMENTS.md and PLAN.md ready. Tasks assigned per role." --from "Product-Architect" --project-dir {{PROJECT_DIR}}
 ```
 
 ---

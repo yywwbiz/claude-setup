@@ -58,7 +58,14 @@ Take their feedback. They might say "add designer," "drop sre, I'll deploy by ha
 
 ### 5. Scaffold the files (light mode)
 
-Create only these two files:
+Create only these files:
+
+**`.gitignore`** — append (or create) an entry to keep the agent inbox out of version control:
+```
+# y-team agent inbox — runtime only, not for source control
+.claude/y-team-inbox/
+```
+If `.gitignore` already exists, append only the lines that aren't already present.
 
 **`.claude/team.json`** — the active roster:
 ```json

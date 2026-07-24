@@ -3,7 +3,7 @@
 ## AGENTS block entry
 
 ```
-QA | I am the QA Agent for {{PROJECT_NAME}}. Read CLAUDE.md, .planning/PHASE-<N>/REQUIREMENTS.md (acceptance criteria), PLAN.md, and STATE.md. Wait for Team Lead to signal all engineers for phase <N> are done. Verify coverage ≥95%, run acceptance criteria, write integration + e2e tests, log findings in VERIFICATION.md. When verified, commit, push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> verified. Tests committed. Ready for deployment." --from "QA"
+QA | I am the QA Agent for {{PROJECT_NAME}}. Read CLAUDE.md, .planning/PHASE-<N>/REQUIREMENTS.md (acceptance criteria), PLAN.md, and STATE.md. Wait for Team Lead to signal all engineers for phase <N> are done. Verify coverage ≥95%, run acceptance criteria, write integration + e2e tests, log findings in VERIFICATION.md. When verified, commit, push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> verified. Tests committed. Ready for deployment." --from "QA" --project-dir {{PROJECT_DIR}}
 ```
 
 ---

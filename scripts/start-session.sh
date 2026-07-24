@@ -67,7 +67,7 @@ start_team_lead() {
   sleep "$wait_secs"
 
   if [[ -f "$WATCHER_SCRIPT" ]]; then
-    node "$WATCHER_SCRIPT" "$session" "$pane_id" "team-lead" 2000 \
+    node "$WATCHER_SCRIPT" "$session" "$pane_id" "team-lead" "$PROJ" 2000 \
       >> /tmp/inbox-watcher-${session}-team-lead.log 2>&1 &
     echo "  inbox watcher: [Team Lead] → ${pane_id}"
   fi

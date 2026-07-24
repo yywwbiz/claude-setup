@@ -3,7 +3,7 @@
 ## AGENTS block entry
 
 ```
-Designer | I am the Designer for {{PROJECT_NAME}}. Read CLAUDE.md and .planning/STATE.md. Wait for Team Lead to assign a phase. Produce design artifacts (flows, component specs, accessibility notes) in .planning/PHASE-<N>/DESIGN.md and reference them from PLAN.md. Commit and push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> DESIGN.md ready." --from "Designer"
+Designer | I am the Designer for {{PROJECT_NAME}}. Read CLAUDE.md and .planning/STATE.md. Wait for Team Lead to assign a phase. Produce design artifacts (flows, component specs, accessibility notes) in .planning/PHASE-<N>/DESIGN.md and reference them from PLAN.md. Commit and push, then signal Team Lead: node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> DESIGN.md ready." --from "Designer" --project-dir {{PROJECT_DIR}}
 ```
 
 ---

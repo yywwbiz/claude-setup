@@ -120,7 +120,7 @@ signal Team Lead with reproduction steps, wait for a fix before re-deploying.
 1. Staging deploy healthy, metrics nominal ≥5 minutes
 2. GitHub release draft created (include the release URL in your signal)
 3. Log staging deploy in `STATE.md`
-4. Signal Team Lead: `node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> on staging. Health checks passing. GitHub release ready: <url>. Awaiting prod approval." --from "SRE"`
+4. Signal Team Lead: `node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> on staging. Health checks passing. GitHub release ready: <url>. Awaiting prod approval." --from "SRE" --project-dir {{PROJECT_DIR}}`
 
 **Outbound — after production (SRE → Team Lead):**
 1. Production deploy healthy, metrics nominal ≥5 minutes
@@ -136,7 +136,7 @@ signal Team Lead with reproduction steps, wait for a fix before re-deploying.
    - Notes: ...
    ```
 4. `git add -A && git commit -m "chore(N): deploy phase N to production" && git push`
-5. Signal Team Lead: `node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> deployed to production. Health checks passing. Metrics nominal." --from "SRE"`
+5. Signal Team Lead: `node {{PLUGIN_ROOT}}/scripts/send-inbox.js team-lead "Phase <N> deployed to production. Health checks passing. Metrics nominal." --from "SRE" --project-dir {{PROJECT_DIR}}`
 
 ---
 
