@@ -5,7 +5,7 @@
 //
 // Resolves the inbox file by trying several name variants of agent_name.
 // Marks messages as read after sending them to the tmux pane.
-// Inbox lives at <project_dir>/.claude/y-team-inbox/ — project-local, never global.
+// Inbox lives at <project_dir>/.claude/y-team/inbox/ — project-local, never global.
 
 const { spawnSync } = require("child_process");
 const fs = require("fs");
@@ -19,7 +19,7 @@ if (!SESSION || !PANE_TARGET || !AGENT_NAME || !PROJECT_DIR) {
   process.exit(1);
 }
 
-const INBOX_DIR = path.join(PROJECT_DIR, ".claude", "y-team-inbox");
+const INBOX_DIR = path.join(PROJECT_DIR, ".claude", "y-team", "inbox");
 const INTERVAL = parseInt(INTERVAL_MS, 10);
 
 // ── Resolve inbox file ────────────────────────────────────────────────────────

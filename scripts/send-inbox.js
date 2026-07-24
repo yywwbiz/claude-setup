@@ -34,7 +34,7 @@ if (!agentName || !messageText) {
   process.exit(1);
 }
 
-const INBOX_DIR = path.join(projectDir, ".claude", "y-team-inbox");
+const INBOX_DIR = path.join(projectDir, ".claude", "y-team", "inbox");
 
 fs.mkdirSync(INBOX_DIR, { recursive: true });
 const inboxFile = path.join(INBOX_DIR, `${agentName}.json`);

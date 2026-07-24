@@ -8,7 +8,7 @@ Run the y-team project kickoff. This is the conversational onboarding that happe
 
 ### 1. Confirm we're in a fresh project
 
-Check whether `.claude/team.json` already exists in the current working directory.
+Check whether `.claude/y-team/team.json` already exists in the current working directory.
 
 - If it exists, ask: "This project already has a y-team roster. Re-run init from scratch (overwrites team.json and CLAUDE.md), or cancel?"
 - If they say cancel, stop. Suggest `/y-team:add` or `/y-team:list` instead.
@@ -63,11 +63,11 @@ Create only these files:
 **`.gitignore`** — append (or create) an entry to keep the agent inbox out of version control:
 ```
 # y-team agent inbox — runtime only, not for source control
-.claude/y-team-inbox/
+.claude/y-team/inbox/
 ```
 If `.gitignore` already exists, append only the lines that aren't already present.
 
-**`.claude/team.json`** — the active roster:
+**`.claude/y-team/team.json`** — the active roster:
 ```json
 {
   "active": ["team-lead", "product-architect", "engineer-web", "..."]
@@ -86,7 +86,7 @@ Always include `"team-lead"` first. Use the personas from step 4.
 This project uses the y-team plugin. Active personas:
 - <list each from team.json with a one-line role description>
 
-The active roster lives in `.claude/team.json`. Team Lead reads it before spawning.
+The active roster lives in `.claude/y-team/team.json`. Team Lead reads it before spawning.
 
 ## Project Files
 
@@ -101,7 +101,7 @@ The active roster lives in `.claude/team.json`. Team Lead reads it before spawni
 - No phase starts without PLAN.md; no phase closes without QA verified + SRE deployed
 ```
 
-**`.claude/ACTIVITY.md`** — the project activity log (Team Lead appends to this as work completes):
+**`.claude/y-team/ACTIVITY.md`** — the project activity log (Team Lead appends to this as work completes):
 ```markdown
 # Activity Log — <project name>
 

@@ -88,9 +88,9 @@ if [[ ! -f "$PERSONA_FILE" ]]; then
   exit 1
 fi
 
-# ── Verify persona is in the active roster (.claude/team.json) ───────────────
+# ── Verify persona is in the active roster (.claude/y-team/team.json) ────────
 
-ROSTER_FILE="${PROJ}/.claude/team.json"
+ROSTER_FILE="${PROJ}/.claude/y-team/team.json"
 if [[ -f "$ROSTER_FILE" ]]; then
   if ! grep -q "\"${PERSONA}\"" "$ROSTER_FILE"; then
     echo "Error: persona '${PERSONA}' is not in this project's active roster."

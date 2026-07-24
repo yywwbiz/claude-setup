@@ -3,13 +3,13 @@ description: Remove a persona from this project's active roster
 argument-hint: "<persona-name>"
 ---
 
-Remove a persona from `.claude/team.json`.
+Remove a persona from `.claude/y-team/team.json`.
 
 Steps:
 
-1. If `$ARGUMENTS` is empty, tell the user the command requires a persona name and list the currently active personas from `.claude/team.json`. Stop.
+1. If `$ARGUMENTS` is empty, tell the user the command requires a persona name and list the currently active personas from `.claude/y-team/team.json`. Stop.
 
-2. Read `.claude/team.json` (if missing, tell the user there is no active roster yet and stop).
+2. Read `.claude/y-team/team.json` (if missing, tell the user there is no active roster yet and stop).
 
 3. If the persona is not in `active`, tell the user it's not in the roster and list what is. Stop.
 

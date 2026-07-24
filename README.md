@@ -18,7 +18,7 @@ Team Lead  ──spawn──►  Product-Architect
 ```
 
 - **Team Lead** lives in the left pane. It's the only agent you talk to.
-- The active roster (which personas are available for *this* project) lives in `.claude/team.json`.
+- The active roster (which personas are available for *this* project) lives in `.claude/y-team/team.json`.
 - All other agents are spawned by Team Lead on demand via the plugin's `spawn-agent.sh`.
 - Agents signal back to Team Lead when their work is done; Team Lead gates each phase transition.
 - Agent-to-agent messages are delivered automatically by `inbox-watcher.js`.
@@ -109,7 +109,7 @@ From a fresh project directory:
 /y-team:init
 ```
 
-This walks you through a short conversational kickoff: what you're building, who it's for, any constraints. Based on your answers it proposes a roster, scaffolds `CLAUDE.md` and `.claude/team.json`, and offers to boot the tmux session. One command, project ready.
+This walks you through a short conversational kickoff: what you're building, who it's for, any constraints. Based on your answers it proposes a roster, scaffolds `CLAUDE.md` and `.claude/y-team/team.json`, and offers to boot the tmux session. One command, project ready.
 
 ### Manual setup (if you prefer)
 
@@ -131,7 +131,7 @@ This walks you through a short conversational kickoff: what you're building, who
 
 ### Day-to-day
 
-- Switch to the tmux session and talk to Team Lead. Team Lead reads `.claude/team.json` and spawns specialists as phases need them.
+- Switch to the tmux session and talk to Team Lead. Team Lead reads `.claude/y-team/team.json` and spawns specialists as phases need them.
 - You can also talk to specialist panes directly when you want to be in the weeds (e.g. whiteboarding with product-architect). Team Lead stays in charge of gates and milestones.
 - `/y-team:status` shows the running session and live panes.
 - `/y-team:stop` kills the session.
@@ -157,9 +157,10 @@ This walks you through a short conversational kickoff: what you're building, who
 ```
 your-project/
 ├── .claude/
-│   ├── team.json              # active roster for this project
-│   ├── ACTIVITY.md            # living log of tasks done, bugs fixed, phase gates (maintained by Team Lead)
-│   └── y-team-inbox/          # agent-to-agent messages (runtime only, gitignored)
+│   └── y-team/
+│       ├── team.json          # active roster for this project
+│       ├── ACTIVITY.md        # living log of tasks done, bugs fixed, phase gates (maintained by Team Lead)
+│       └── inbox/             # agent-to-agent messages (runtime only, gitignored)
 ├── .planning/
 │   ├── ROADMAP.md             # phase order and status
 │   ├── STATE.md               # live blockers, decisions, open questions
@@ -173,7 +174,7 @@ your-project/
 
 ### Activity log
 
-`.claude/ACTIVITY.md` is a running dated log Team Lead appends to whenever work lands: completed tasks (with commit hash), bugs fixed, and phase gates (PLAN ready / VERIFIED / DEPLOYED). It's committed to the repo so you always have a traceable trail of what was done and when.
+`.claude/y-team/ACTIVITY.md` is a running dated log Team Lead appends to whenever work lands: completed tasks (with commit hash), bugs fixed, and phase gates (PLAN ready / VERIFIED / DEPLOYED). It's committed to the repo so you always have a traceable trail of what was done and when.
 
 The `.planning/` convention is borrowed from GSD but the plugin does not depend on the GSD plugin — the personas have the phase lifecycle baked in.
 
@@ -183,7 +184,7 @@ The `.planning/` convention is borrowed from GSD but the plugin does not depend 
 
 `scripts/inbox-watcher.js` polls each agent's inbox file and feeds unread messages into the agent's tmux pane automatically. `scripts/send-inbox.js` writes messages to an agent's inbox.
 
-Inboxes are stored at `.claude/y-team-inbox/<agent-name>.json` inside the project directory — one inbox directory per project, never shared globally. Running y-team on two projects simultaneously keeps their agent communication completely separate. `/y-team:init` adds `.claude/y-team-inbox/` to `.gitignore` so inbox files are never committed.
+Inboxes are stored at `.claude/y-team/inbox/<agent-name>.json` inside the project directory — one inbox directory per project, never shared globally. Running y-team on two projects simultaneously keeps their agent communication completely separate. `/y-team:init` adds `.claude/y-team/inbox/` to `.gitignore` so inbox files are never committed.
 
 Watcher logs go to `/tmp/inbox-watcher-<session>.log`.
 

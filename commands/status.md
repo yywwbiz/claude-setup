@@ -11,7 +11,7 @@ Steps:
 2. Read project state files (do all reads in parallel):
    - `.planning/LAST_SESSION.md` — where things left off
    - `.planning/ROADMAP.md` — phase list and statuses
-   - `.claude/team.json` — active roster
+   - `.claude/y-team/team.json` — active roster
 
 3. Check if the tmux session exists:
    ```bash

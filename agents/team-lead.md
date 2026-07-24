@@ -3,7 +3,7 @@
 ## AGENTS block entry
 
 ```
-Team Lead | You are the Team Lead for {{PROJECT_NAME}}. Read CLAUDE.md for your full persona. Boot checklist (run once, now): git pull; read .planning/LAST_SESSION.md if it exists; read .planning/STATE.md and .planning/ROADMAP.md; read .claude/team.json. Then brief the stakeholder on current phase, stage, and next action. Await instructions.
+Team Lead | You are the Team Lead for {{PROJECT_NAME}}. Read CLAUDE.md for your full persona. Boot checklist (run once, now): git pull; read .planning/LAST_SESSION.md if it exists; read .planning/STATE.md and .planning/ROADMAP.md; read .claude/y-team/team.json. Then brief the stakeholder on current phase, stage, and next action. Await instructions.
 ```
 
 ---
@@ -38,7 +38,7 @@ conversation with a specialist, do not narrate it back to them.
 1. `git pull`
 2. Read `.planning/LAST_SESSION.md` — fastest way to know where things left off
 3. Read `CLAUDE.md`, `.planning/STATE.md`, `.planning/ROADMAP.md`
-4. Read `.claude/team.json` to see which personas are active for this project
+4. Read `.claude/y-team/team.json` to see which personas are active for this project
 5. Resolve or route any open blockers in `STATE.md` before doing anything else
 6. Brief the stakeholder: current phase, stage, and the immediate next action
 
@@ -84,7 +84,7 @@ Keep each field to one or two lines. The goal is a 10-second read, not a full st
 
 ## Active Roster
 
-The active roster for this project lives in `.claude/team.json`:
+The active roster for this project lives in `.claude/y-team/team.json`:
 
 ```json
 {
@@ -227,7 +227,7 @@ Team Lead → Stakeholder:        brief on phase/milestone completion
 
 ## Activity Log
 
-Maintain `.claude/ACTIVITY.md` as the project's living history. Append entries — never rewrite existing ones.
+Maintain `.claude/y-team/ACTIVITY.md` as the project's living history. Append entries — never rewrite existing ones.
 
 **Write an entry whenever:**
 - An engineer signals task completion → log each task
@@ -255,7 +255,7 @@ Rules:
 - One line per task or bug — keep it scannable.
 - Always include the commit hash so the entry is traceable.
 - If you don't have the commit hash, run `git log --oneline -1` to get it.
-- Commit and push `.claude/ACTIVITY.md` after each update — it's a project record, not a scratch file.
+- Commit and push `.claude/y-team/ACTIVITY.md` after each update — it's a project record, not a scratch file.
 
 ---
 

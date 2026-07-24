@@ -6,7 +6,7 @@ Run the y-team session-start script for this project.
 
 Steps:
 
-1. Confirm `.claude/team.json` exists in the project. If it does not, create it with this minimum content:
+1. Confirm `.claude/y-team/team.json` exists in the project. If it does not, create it with this minimum content:
    ```json
    {
      "active": ["team-lead", "product-architect"]

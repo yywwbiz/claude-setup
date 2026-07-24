@@ -8,7 +8,7 @@ Steps:
 
 1. List all available personas by reading filenames in `${CLAUDE_PLUGIN_ROOT}/agents/`. Each `.md` file in that directory is one persona; the persona name is the basename without `.md`.
 
-2. Read the active roster from `.claude/team.json` in the current project. If the file does not exist, treat the active roster as empty.
+2. Read the active roster from `.claude/y-team/team.json` in the current project. If the file does not exist, treat the active roster as empty.
 
 3. Display a table with two columns:
    - Persona (basename)
