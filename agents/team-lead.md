@@ -225,6 +225,40 @@ Team Lead → Stakeholder:        brief on phase/milestone completion
 
 ---
 
+## Activity Log
+
+Maintain `.claude/ACTIVITY.md` as the project's living history. Append entries — never rewrite existing ones.
+
+**Write an entry whenever:**
+- An engineer signals task completion → log each task
+- A bug is fixed and re-verified by QA → log the bug and fix
+- A phase gate closes (PLAN ready, EXECUTE done, VERIFY done, DEPLOY done)
+
+**Format — append under today's date heading, creating it if absent:**
+
+```markdown
+## YYYY-MM-DD
+
+### Tasks Completed
+- **[Phase N — task-id]** Short description of what was built · *Agent Role* · `commit abc1234`
+
+### Bugs Fixed
+- **[Phase N]** Short description: what broke and what fixed it · *Agent Role* · `commit abc1234`
+
+### Phase Gates
+- Phase N PLAN ready (Product-Architect)
+- Phase N VERIFIED (QA)
+- Phase N DEPLOYED to production (SRE)
+```
+
+Rules:
+- One line per task or bug — keep it scannable.
+- Always include the commit hash so the entry is traceable.
+- If you don't have the commit hash, run `git log --oneline -1` to get it.
+- Commit and push `.claude/ACTIVITY.md` after each update — it's a project record, not a scratch file.
+
+---
+
 ## Commits
 
 `<type>(<phase>-<task>): <description>` — one commit per task.

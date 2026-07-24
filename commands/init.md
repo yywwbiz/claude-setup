@@ -101,6 +101,13 @@ The active roster lives in `.claude/team.json`. Team Lead reads it before spawni
 - No phase starts without PLAN.md; no phase closes without QA verified + SRE deployed
 ```
 
+**`.claude/ACTIVITY.md`** — the project activity log (Team Lead appends to this as work completes):
+```markdown
+# Activity Log — <project name>
+
+_Maintained by Team Lead. One entry per completed task, bug fix, and phase gate — newest at the bottom._
+```
+
 Do NOT create `.planning/` files. Team Lead and product-architect will create those when the first phase begins (light scaffolding mode).
 
 ### 6. Offer to boot the session

@@ -158,6 +158,7 @@ This walks you through a short conversational kickoff: what you're building, who
 your-project/
 ├── .claude/
 │   ├── team.json              # active roster for this project
+│   ├── ACTIVITY.md            # living log of tasks done, bugs fixed, phase gates (maintained by Team Lead)
 │   └── y-team-inbox/          # agent-to-agent messages (runtime only, gitignored)
 ├── .planning/
 │   ├── ROADMAP.md             # phase order and status
@@ -169,6 +170,10 @@ your-project/
 │       └── VERIFICATION.md    # QA findings and sign-off
 └── ... (your code)
 ```
+
+### Activity log
+
+`.claude/ACTIVITY.md` is a running dated log Team Lead appends to whenever work lands: completed tasks (with commit hash), bugs fixed, and phase gates (PLAN ready / VERIFIED / DEPLOYED). It's committed to the repo so you always have a traceable trail of what was done and when.
 
 The `.planning/` convention is borrowed from GSD but the plugin does not depend on the GSD plugin — the personas have the phase lifecycle baked in.
 
