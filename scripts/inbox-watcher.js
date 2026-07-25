@@ -3,15 +3,14 @@
 //
 // Usage: node inbox-watcher.js <session> <pane> <agent_name> <project_dir> [poll_interval_ms]
 //
-// Resolves the inbox file by trying several name variants of agent_name.
-// Marks messages as read after sending them to the tmux pane.
+// Inbox filename is always the normalized agent name (lowercase, spaces→hyphens).
+// The inbox file is created immediately on startup so send-inbox.js always has somewhere to write.
 // Inbox lives at <project_dir>/.claude/y-team/inbox/ — project-local, never global.
 
 const { spawnSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
-// PANE_TARGET is a tmux pane ID (e.g. %5) — avoids hard-coding window/pane indices.
 const [, , SESSION, PANE_TARGET, AGENT_NAME, PROJECT_DIR, INTERVAL_MS = "2000"] = process.argv;
 
 if (!SESSION || !PANE_TARGET || !AGENT_NAME || !PROJECT_DIR) {
@@ -19,24 +18,22 @@ if (!SESSION || !PANE_TARGET || !AGENT_NAME || !PROJECT_DIR) {
   process.exit(1);
 }
 
+// Canonical inbox name — must match the normalization in send-inbox.js
+function normalizeAgentName(name) {
+  return name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+}
+
 const INBOX_DIR = path.join(PROJECT_DIR, ".claude", "y-team", "inbox");
+const INBOX_FILE = path.join(INBOX_DIR, `${normalizeAgentName(AGENT_NAME)}.json`);
 const INTERVAL = parseInt(INTERVAL_MS, 10);
 
-// ── Resolve inbox file ────────────────────────────────────────────────────────
-
-function findInbox(name) {
-  const first = name.split(" ")[0];
-  const candidates = [
-    `${name}.json`,
-    `${name.replace(" Agent", "")}.json`,
-    `${first}.json`,
-    `${name.toLowerCase()}.json`,
-    `${first.toLowerCase()}.json`,
-    `${name.replace(/ /g, "-")}.json`,
-  ].map((f) => path.join(INBOX_DIR, f));
-
-  return candidates.find((f) => fs.existsSync(f)) || null;
+// Create inbox immediately so send-inbox.js always has a file to append to
+fs.mkdirSync(INBOX_DIR, { recursive: true });
+if (!fs.existsSync(INBOX_FILE)) {
+  fs.writeFileSync(INBOX_FILE, "[]");
 }
+
+console.log(`[inbox-watcher] Watching ${INBOX_FILE} → pane ${PANE_TARGET}`);
 
 // ── Send text into tmux pane ──────────────────────────────────────────────────
 
@@ -44,48 +41,19 @@ function sendToPane(text) {
   // tmux send-keys doesn't handle newlines well — send line by line
   const lines = text.split("\n");
   for (const line of lines) {
-    spawnSync("tmux", ["send-keys", "-t", PANE_TARGET, line, ""], {
-      stdio: "inherit",
-    });
+    spawnSync("tmux", ["send-keys", "-t", PANE_TARGET, line, ""], { stdio: "inherit" });
   }
-  // Final Enter to submit
-  spawnSync("tmux", ["send-keys", "-t", PANE_TARGET, "", "Enter"], {
-    stdio: "inherit",
-  });
+  spawnSync("tmux", ["send-keys", "-t", PANE_TARGET, "", "Enter"], { stdio: "inherit" });
 }
 
 // ── Poll loop ─────────────────────────────────────────────────────────────────
 
-let inboxFile = null;
-let waitedMs = 0;
-const MAX_WAIT_MS = 60000;
-
-console.log(`[inbox-watcher] Watching inbox for "${AGENT_NAME}" → ${PANE_TARGET} (project: ${PROJECT_DIR})`);
-
 const poll = setInterval(() => {
-  // Resolve inbox file if not found yet
-  if (!inboxFile) {
-    inboxFile = findInbox(AGENT_NAME);
-    if (!inboxFile) {
-      waitedMs += INTERVAL;
-      if (waitedMs >= MAX_WAIT_MS) {
-        // Create empty inbox so agent can receive future messages
-        inboxFile = path.join(INBOX_DIR, `${AGENT_NAME}.json`);
-        fs.mkdirSync(INBOX_DIR, { recursive: true });
-        fs.writeFileSync(inboxFile, "[]");
-        console.log(`[inbox-watcher] Created inbox: ${inboxFile}`);
-      }
-      return;
-    }
-    console.log(`[inbox-watcher] Found inbox: ${inboxFile}`);
-  }
-
-  // Read inbox
   let messages;
   try {
-    messages = JSON.parse(fs.readFileSync(inboxFile, "utf8"));
+    messages = JSON.parse(fs.readFileSync(INBOX_FILE, "utf8"));
   } catch {
-    return; // malformed or empty — skip
+    return; // malformed — skip this tick
   }
 
   const unread = messages.filter((m) => !m.read);
@@ -101,14 +69,12 @@ const poll = setInterval(() => {
     Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1000);
   }
 
-  // Persist read state
   try {
-    fs.writeFileSync(inboxFile, JSON.stringify(messages, null, 2));
+    fs.writeFileSync(INBOX_FILE, JSON.stringify(messages, null, 2));
   } catch (e) {
     console.error(`[inbox-watcher] Failed to write inbox: ${e.message}`);
   }
 }, INTERVAL);
 
-// Keep process alive
 process.on("SIGTERM", () => { clearInterval(poll); process.exit(0); });
 process.on("SIGINT",  () => { clearInterval(poll); process.exit(0); });

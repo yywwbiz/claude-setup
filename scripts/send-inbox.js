@@ -34,10 +34,13 @@ if (!agentName || !messageText) {
   process.exit(1);
 }
 
+// Canonical inbox name — must match the normalization in inbox-watcher.js
+const normalizedName = agentName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+
 const INBOX_DIR = path.join(projectDir, ".claude", "y-team", "inbox");
 
 fs.mkdirSync(INBOX_DIR, { recursive: true });
-const inboxFile = path.join(INBOX_DIR, `${agentName}.json`);
+const inboxFile = path.join(INBOX_DIR, `${normalizedName}.json`);
 
 let messages = [];
 if (fs.existsSync(inboxFile)) {
