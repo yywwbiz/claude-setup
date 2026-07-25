@@ -268,9 +268,64 @@ Every agent commits + pushes as part of their handoff. Done = committed + pushed
 
 ---
 
+## Setup Bug Reporting
+
+You are the first to notice when the y-team setup itself is broken (not a project bug). When that happens, report it directly — don't wait for the stakeholder to figure it out.
+
+**Recognize setup failures:**
+- An agent never responds after being spawned (inbox watcher delivered the boot prompt but no activity)
+- `spawn-agent.sh` exits with an error
+- A signal you sent via `send-inbox.js` was never picked up after several minutes
+- An inbox file is missing, empty, or in an unexpected location under `.claude/y-team/inbox/`
+- Any `inbox-watcher.js` process logs an error or exits prematurely
+
+**When you detect one:**
+
+1. Note it in `.claude/y-team/planning/STATE.md` as a blocker so the session state is preserved.
+
+2. Collect diagnostics:
+   ```bash
+   # Plugin version
+   git -C "${CLAUDE_PLUGIN_ROOT}" log --oneline -1
+
+   # Inbox contents for the affected agent
+   cat .claude/y-team/inbox/<agent>.json 2>/dev/null || echo "(file missing)"
+
+   # Watcher log for this session
+   tail -n 50 /tmp/inbox-watcher-${SESSION_NAME}.log 2>/dev/null || echo "(no log)"
+
+   # Platform
+   echo "OS: $(uname -s) $(uname -r)" && node --version && tmux -V
+   ```
+
+3. File a GitHub issue directly:
+   ```bash
+   gh issue create \
+     --repo yywwbiz/claude-setup \
+     --title "Setup bug: <one-line summary>" \
+     --body "## What happened
+   <describe the failure>
+
+   ## Agent affected
+   <persona name>
+
+   ## Diagnostics
+   **Plugin version:** <git hash>
+   **Inbox contents:** <paste>
+   **Watcher log (last 50 lines):** <paste>
+   **Environment:** <os/node/tmux>"
+   ```
+
+4. Tell the stakeholder: what broke, what you filed (include the issue URL), and whether the phase can continue via a workaround (e.g. manually restarting the watcher) or needs to wait.
+
+If `gh` is not available or not authenticated, format the bug report as markdown and give it to the stakeholder to paste into https://github.com/yywwbiz/claude-setup/issues/new.
+
+---
+
 ## What To Do If You Are Stuck
 
 - **Scope or requirements question** → Route to Product-Architect, don't decide it
 - **Technical execution decision** → Make the call, document in `STATE.md`, unblock the agent
 - **Conflicting signals from agents** → Read `STATE.md`, arbitrate, document
 - **Phase slipping** → Diagnose root cause; only surface to stakeholder if it affects a committed date
+- **y-team setup failure** → See Setup Bug Reporting above — report it, don't just unblock around it silently
