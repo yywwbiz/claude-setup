@@ -90,6 +90,34 @@ After installing `gh`, authenticate once with `gh auth login`.
 
 ---
 
+## Terminal requirements
+
+y-team uses tmux for the split-pane agent workspace. **You need to view it in a terminal that renders tmux properly** — not in Claude Code's built-in terminal or an IDE panel.
+
+**Recommended terminals (tested):**
+
+| Terminal | Platform | Notes |
+|---|---|---|
+| [Ghostty](https://ghostty.org) | macOS / Linux | Excellent tmux rendering, true color, recommended |
+| [iTerm2](https://iterm2.com) | macOS | Great tmux support; optionally use `tmux -CC` for native pane integration |
+| [WezTerm](https://wezfurlong.org/wezterm/) | macOS / Linux / Windows | Works well out of the box |
+| [Alacritty](https://alacritty.org) | macOS / Linux / Windows | Minimal, fast, solid tmux support |
+| Terminal.app | macOS (built-in) | Works but no true color — pane borders may look plain |
+
+**What does not work well:**
+- **VS Code / Cursor integrated terminal** — tmux runs but split panes don't render correctly; colors and borders degrade. Use an external terminal instead.
+- **JetBrains IDE terminal** — same issue.
+
+**The workflow:** run `/y-team:start` inside Claude Code (any terminal), then switch to your external terminal and attach:
+
+```bash
+tmux attach -t <project-name>
+```
+
+You'll see Team Lead in the left pane and agent panes opening on the right as work progresses. Claude Code stays in the background handling the `/y-team:*` commands.
+
+---
+
 ## Install (local)
 
 This plugin is local-only — it ships a marketplace manifest that points at the directory on disk. There's no remote install yet.
