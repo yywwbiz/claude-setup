@@ -36,13 +36,23 @@ if (!fs.existsSync(INBOX_FILE)) {
 console.log(`[inbox-watcher] Watching ${INBOX_FILE} → pane ${PANE_TARGET}`);
 
 // ── Send text into tmux pane ──────────────────────────────────────────────────
+// Uses load-buffer + paste-buffer (atomic) instead of send-keys to avoid
+// Claude Code mis-detecting long lines as pastes and corrupting them into
+// [Pasted text #N] placeholders with a garbled tail fragment.
+// Named buffers prevent collisions when multiple watchers deliver simultaneously.
 
 function sendToPane(text) {
-  // tmux send-keys doesn't handle newlines well — send line by line
   const lines = text.split("\n");
   for (const line of lines) {
-    spawnSync("tmux", ["send-keys", "-t", PANE_TARGET, line, ""], { stdio: "inherit" });
+    const bufName = `y-team-${process.pid}-${Date.now()}`;
+    spawnSync("tmux", ["load-buffer", "-b", bufName, "-"], {
+      input: line,
+      stdio: ["pipe", "inherit", "inherit"],
+    });
+    spawnSync("tmux", ["paste-buffer", "-b", bufName, "-t", PANE_TARGET]);
+    spawnSync("tmux", ["delete-buffer", "-b", bufName]);
   }
+  // Enter is a key, not text — send-keys is correct here
   spawnSync("tmux", ["send-keys", "-t", PANE_TARGET, "", "Enter"], { stdio: "inherit" });
 }
 
