@@ -1,14 +1,16 @@
 #!/usr/bin/env zsh
-# start-session.sh — start Team Lead in a tmux window
+# start-session.sh — boot Team Lead in pane 0 of a dedicated project tmux session
 #
-# If already inside tmux: opens a new "Team Lead" window in the current session.
-# If not in tmux: creates a new named session and attaches to it.
+# Always creates a named project session with Team Lead in pane 0, regardless of
+# whether the script is run from inside or outside an existing tmux session.
+# When already inside tmux, switches the client to the project session instead of
+# appending a window to the current session.
 #
 # Usage:
 #   start-session.sh [OPTIONS]
 #
 # Options:
-#   -s, --session NAME    session name when creating a new one (default: basename of project dir)
+#   -s, --session NAME    session name (default: basename of project dir)
 #   -p, --project PATH    project directory (default: pwd)
 #   -h, --help            show this help
 
@@ -44,13 +46,11 @@ if [[ -f "$TL_PERSONA_FILE" ]]; then
     inblock && /^```/ { if (started) { exit } else { started=1; next } }
     inblock && started && NF { print; exit }
   ' "$TL_PERSONA_FILE")"
-  # Strip the "Team Lead | " label prefix, leaving just the prompt text
   TL_PROMPT="${TL_PROMPT#*| }"
-  # Substitute project name
   TL_PROMPT="${TL_PROMPT//\{\{PROJECT_NAME\}\}/$(basename "$PROJ")}"
 fi
 
-# ── Helper: start Team Lead in a given pane ───────────────────────────────────
+# ── Helper: boot Team Lead in a given pane ───────────────────────────────────
 
 start_team_lead() {
   local session="$1" pane_id="$2"
@@ -77,57 +77,40 @@ start_team_lead() {
   fi
 }
 
-# ── Already inside tmux: open a new window in the current session ─────────────
-
-if [[ -n "${TMUX:-}" ]]; then
-  SESSION="$(tmux display-message -p '#S')"
-
-  # If a Team Lead window already exists, just switch to it
-  if tmux list-windows -t "$SESSION" -F '#{window_name}' 2>/dev/null | grep -qx 'Team Lead'; then
-    echo "Team Lead window already exists in '${SESSION}' — switching."
-    tmux select-window -t "${SESSION}:Team Lead"
-    exit 0
-  fi
-
-  WIN="$(tmux new-window -t "${SESSION}:" -n "Team Lead" -c "$PROJ" -P -F '#{window_index}')"
-  PANE_ID="$(tmux display-message -t "${SESSION}:${WIN}" -p '#{pane_id}')"
-
-  start_team_lead "$SESSION" "$PANE_ID"
-  tmux select-window -t "${SESSION}:${WIN}"
-
-  echo ""
-  echo "Team Lead window ready in session '${SESSION}'."
-  echo "Detach: Ctrl+B D"
-  exit 0
-fi
-
-# ── Not in tmux: create a new named session and attach ────────────────────────
+# ── If the project session already exists, just switch/attach to it ───────────
 
 SESSION="$SESSION_NAME"
 
 if tmux has-session -t "$SESSION" 2>/dev/null; then
-  echo "Session '${SESSION}' already exists — attaching."
-  tmux attach-session -t "$SESSION"
+  echo "Session '${SESSION}' already exists."
+  if [[ -n "${TMUX:-}" ]]; then
+    tmux switch-client -t "$SESSION"
+  else
+    tmux attach-session -t "$SESSION"
+  fi
   exit 0
 fi
+
+# ── Create the project session (detached) and boot Team Lead in pane 0 ────────
 
 tmux new-session -d -s "$SESSION" -c "$PROJ"
 tmux set-option -t "$SESSION" mouse on
 
-# Use the actual first window index (respects user's base-index setting)
 WIN="$(tmux display-message -t "${SESSION}" -p '#{window_index}')"
 PANE_ID="$(tmux display-message -t "${SESSION}:${WIN}" -p '#{pane_id}')"
 
-# Rename the window
 tmux rename-window -t "${SESSION}:${WIN}" "Team Lead"
-
 tmux source-file ~/.tmux.conf 2>/dev/null || true
 
 start_team_lead "$SESSION" "$PANE_ID"
 
 echo ""
-echo "Session '${SESSION}' ready."
+echo "Session '${SESSION}' ready. Team Lead is in pane 0."
 echo "Mouse: enabled (scroll, click, drag to resize)"
-echo "Detach: Ctrl+B D"
 echo ""
-tmux attach-session -t "$SESSION"
+
+if [[ -n "${TMUX:-}" ]]; then
+  tmux switch-client -t "$SESSION"
+else
+  tmux attach-session -t "$SESSION"
+fi
