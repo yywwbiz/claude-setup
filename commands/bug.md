@@ -1,8 +1,8 @@
 ---
-description: Report a bug in the y-team setup — collects diagnostics and files a GitHub issue
+description: Report a bug in the y-team setup — collects diagnostics and shows a formatted report
 ---
 
-Guide the user through filing a bug report against the y-team plugin repo. Collect context automatically so the report is actionable without back-and-forth.
+Guide the user through preparing a bug report against the y-team plugin. Collect context automatically, format the report, and show it in the conversation. Filing is always the user's choice — never auto-file.
 
 ## Flow
 
@@ -42,13 +42,10 @@ node --version 2>/dev/null
 tmux -V 2>/dev/null
 ```
 
-### 3. Compose the issue
+### 3. Format and show the report
 
-Build a GitHub issue from the collected information:
+Derive a concise title from the user's description (do not ask). Then render the full report in the conversation as a markdown code block so the user can copy it:
 
-**Title:** one concise line summarizing the bug (derive from the user's description — do not ask)
-
-**Body:**
 ```markdown
 ## What happened
 <user's description>
@@ -76,41 +73,29 @@ Build a GitHub issue from the collected information:
 <platform/shell/node/tmux versions>
 ```
 
-### 4. Preview and confirm
+After showing the report, tell the user:
 
-Show the user the full issue title and body. Ask:
+> "You can file this at **https://github.com/yywwbiz/claude-setup/issues/new** — paste the title and body above.
+> If you'd like me to try filing it via `gh` CLI, just say so."
 
-> "Does this look right? I'll file it to yywwbiz/claude-setup. (yes / edit / cancel)"
+### 4. Only file via gh if the user explicitly asks
 
-- **yes** → proceed to step 5
-- **edit** → ask what to change, update the draft, re-confirm
-- **cancel** → stop; offer to print the markdown so they can file it manually
+If the user says to try `gh`:
 
-### 5. File the issue
-
-Check if `gh` is available:
-```bash
-gh --version 2>/dev/null
-```
-
-**If `gh` is available:**
 ```bash
 gh issue create \
   --repo yywwbiz/claude-setup \
   --title "<title>" \
-  --body "<body>"
+  --body "<body>" 2>&1
 ```
-Print the issue URL when done.
 
-**If `gh` is not available:**
-Tell the user:
-> "`gh` CLI is not installed or not authenticated. Here's the formatted bug report — you can paste it directly into a new issue at https://github.com/yywwbiz/claude-setup/issues/new"
+If the command succeeds, print the issue URL.
 
-Then print the full markdown.
+If it fails (wrong domain, auth, network), tell the user what went wrong and remind them they can file manually at the URL above. Do not write the report to any file.
 
 ## Notes
 
-- Never file without explicit confirmation.
-- If the watcher logs are very long, trim to the most recent 50 lines — don't dump hundreds of lines into the issue.
-- Sensitive paths (home directory) in logs should be replaced with `~` before including.
-- If the user is not currently in a y-team project directory, that's fine — skip the team.json and ACTIVITY.md sections gracefully.
+- Never take an outward action (filing, writing files) without the user explicitly asking.
+- Trim watcher logs to the most recent 50 lines — don't dump hundreds of lines.
+- Replace home directory paths with `~` before including in the report.
+- If not in a y-team project directory, skip team.json and ACTIVITY.md gracefully.

@@ -298,12 +298,12 @@ You are the first to notice when the y-team setup itself is broken (not a projec
    echo "OS: $(uname -s) $(uname -r)" && node --version && tmux -V
    ```
 
-3. File a GitHub issue directly:
-   ```bash
-   gh issue create \
-     --repo yywwbiz/claude-setup \
-     --title "Setup bug: <one-line summary>" \
-     --body "## What happened
+3. Format a bug report and give it to the stakeholder in the conversation:
+
+   ```markdown
+   **y-team setup bug — <one-line summary>**
+
+   ## What happened
    <describe the failure>
 
    ## Agent affected
@@ -313,12 +313,15 @@ You are the first to notice when the y-team setup itself is broken (not a projec
    **Plugin version:** <git hash>
    **Inbox contents:** <paste>
    **Watcher log (last 50 lines):** <paste>
-   **Environment:** <os/node/tmux>"
+   **Environment:** <os/node/tmux>
    ```
 
-4. Tell the stakeholder: what broke, what you filed (include the issue URL), and whether the phase can continue via a workaround (e.g. manually restarting the watcher) or needs to wait.
+   Then tell the stakeholder:
+   > "This looks like a y-team setup bug. You can file it at https://github.com/yywwbiz/claude-setup/issues/new — or ask me to try `gh issue create` if you're on a network that can reach public GitHub."
 
-If `gh` is not available or not authenticated, format the bug report as markdown and give it to the stakeholder to paste into https://github.com/yywwbiz/claude-setup/issues/new.
+   Do not auto-file. Do not write to any file. The stakeholder decides what to do with the report.
+
+4. Tell the stakeholder whether the phase can continue via a workaround (e.g. manually restarting the watcher) or needs to wait for a fix.
 
 ---
 

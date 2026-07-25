@@ -216,7 +216,7 @@ This walks you through a short conversational kickoff: what you're building, who
 | `/y-team:remove <persona>` | Remove a persona from the active roster |
 | `/y-team:status` | Show running session and live agent panes |
 | `/y-team:stop` | Kill the tmux session |
-| `/y-team:bug` | Report a bug in y-team — collects diagnostics and files a GitHub issue |
+| `/y-team:bug` | Report a bug in y-team — collects diagnostics and shows a formatted report you can file manually |
 
 ---
 
