@@ -45,9 +45,48 @@ Pick a small set per project. A typical web app might run `team-lead` + `product
 
 ## Prerequisites
 
-- [tmux](https://github.com/tmux/tmux)
-- [Claude Code CLI](https://claude.ai/code) (`claude` on PATH)
-- Node.js (for the inbox watcher)
+Install these before using y-team. The plugin does not install them for you.
+
+**tmux** — required for the multi-pane agent session
+
+```bash
+# macOS
+brew install tmux
+
+# Ubuntu / Debian
+sudo apt install tmux
+
+# Fedora / RHEL
+sudo dnf install tmux
+```
+
+**Claude Code CLI** — required (`claude` must be on PATH)
+
+See [claude.ai/code](https://claude.ai/code) for install instructions.
+
+**Node.js** — required (runs the inbox watcher and send-inbox scripts)
+
+```bash
+# macOS
+brew install node
+
+# Or via nvm (any platform)
+nvm install --lts
+```
+
+**gh CLI** — optional, required only for `/y-team:bug` to file issues automatically
+
+```bash
+# macOS
+brew install gh
+
+# Ubuntu / Debian
+sudo apt install gh
+
+# Or see https://cli.github.com for other platforms
+```
+
+After installing `gh`, authenticate once with `gh auth login`.
 
 ---
 
